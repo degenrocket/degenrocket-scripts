@@ -243,24 +243,24 @@ bash scripts/initial-server-setup/06-user-setup-git.sh
 ### Customize the app
 
 ```
-# Adjust .env if you've changed default database user or password
+# Adjust backend/.env if you've changed default database user or password
 nano ~/apps/degenrocket/backend/.env
 
-# Adjust customizable options in .env
+# Set app name, social media links and other options in frontend/.env
 nano ~/apps/degenrocket/frontend/.env
 
-# Make sure API_URL and API_HOST are set properly in frontend/.env:
-# Example of production with SSL certificate (https) and Nginx:
+# Make sure API_URL is set properly in frontend/.env.
+# Some examples:
+# Production with SSL certificate (https) and Nginx
 API_URL=https://degenrocket.space
-API_HOST=degenrocket.space
-# Example of testing in VM with Nginx:
+# Testing in VM with Nginx (port forwarding)
 API_URL=http://192.168.122.200
-API_HOST=192.168.122.200
-# Example of testing locally without Nginx:
+# Testing locally without Nginx
 API_URL=http://localhost:5000
-API_HOST=localhost
 
-# Change custom files: intro, contacts
+# Fill in your social media and other links in frontend/.env.
+
+# Change custom files: intro, contacts (optional)
 nano ~/apps/degenrocket/frontend/components/custom/contacts.vue
 nano ~/apps/degenrocket/frontend/components/custom/intro.vue
 

@@ -30,6 +30,10 @@ bash -c ". ~/.nvm/nvm.sh && cd ${FRONTEND_FOLDER} && npm install"
 # "Are you interested in participating?
 # You can type 'n' and press 'enter' to continue the script.
 
+# Custom components
+cp ${FRONTEND_FOLDER}/components/custom/contacts.example.vue ${FRONTEND_FOLDER}/components/custom/contacts.vue
+cp ${FRONTEND_FOLDER}/components/custom/intro.example.vue ${FRONTEND_FOLDER}/components/custom/intro.vue
+
 # Environment variables
 cp ${BACKEND_FOLDER}/.env.example ${BACKEND_FOLDER}/.env
 cp ${FRONTEND_FOLDER}/.env.example ${FRONTEND_FOLDER}/.env
