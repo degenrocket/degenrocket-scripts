@@ -31,8 +31,8 @@ bash -c ". ~/.nvm/nvm.sh && cd ${FRONTEND_FOLDER} && npm install"
 # You can type 'n' and press 'enter' to continue the script.
 
 # Custom components
-cp ${FRONTEND_FOLDER}/components/custom/contacts.example.vue ${FRONTEND_FOLDER}/components/custom/contacts.vue
-cp ${FRONTEND_FOLDER}/components/custom/intro.example.vue ${FRONTEND_FOLDER}/components/custom/intro.vue
+cp ${FRONTEND_FOLDER}/components/custom/CustomContacts.example.vue ${FRONTEND_FOLDER}/components/custom/CustomContacts.vue
+cp ${FRONTEND_FOLDER}/components/custom/CustomIntro.example.vue ${FRONTEND_FOLDER}/components/custom/CustomIntro.vue
 
 # Environment variables
 cp ${BACKEND_FOLDER}/.env.example ${BACKEND_FOLDER}/.env
