@@ -51,11 +51,11 @@ Choose TTL '3h' or leave it as default.
 # Type:A, Name:www.degenrocket.space, IPv4:20.21.03.01, TTL:3h
 # Type:A, Name:staging.degenrocket.space, IPv4:20.21.03.01, TTL:3h
 ```
-```
-# Note: if you want to use 'AAAA' to link to an IPv6 address,
-# then make sure that your firewall allows IPv6.
-# For example, 'IPV6=yes' in /etc/default/ufw
-```
+
+Note: if you want to use 'AAAA' to link to an IPv6 address,
+then make sure that your firewall allows IPv6.
+
+For example, `IPV6=yes` in `/etc/default/ufw`
 
 ---
 
@@ -68,37 +68,49 @@ Generate and upload an SSH key to your hosting provider.
 ssh-keygen -t ed25519 -C "YOUR_NAME"
 # Example:
 ssh-keygen -t ed25519 -C "user"
+```
 
-# Add your SSH .pub to your VPS provider.
-# On Linux SSH .pub is usually located at '~/.ssh/YOUR_NAME.pub'
-# Copy the content of "YOUR_NAME.pub" to clipboard with a text editor
-# or with a wl-copy command if wl-clipboard is installed, e.g.:
+#### Add your SSH .pub to your VPS provider.
+
+On Linux SSH .pub is usually located at `~/.ssh/YOUR_NAME.pub`
+
+Copy the content of `YOUR_NAME.pub` to clipboard with a text editor
+or with a `wl-copy` command if wl-clipboard is installed, e.g.:
+
+```
 wl-copy < ~/.ssh/user.pub
-# Open your VPS provider and paste your SSH pub key into an SSH box.
-# If you're testing in VM, then paste into '/root/.ssh/authorized_keys'
-# Note: it's important to use SSH keys because the password authentication
-# will be disabled by one of the following setup scripts.
+```
 
+Open your VPS provider and paste your SSH pub key into an SSH box.
+
+If you're testing in VM, then paste into `/root/.ssh/authorized_keys`
+
+Note: it's important to use SSH keys because the password authentication
+will be disabled by one of the following setup scripts.
+
+```
 # SSH into your server as root
 ssh -i ~/.ssh/YOUR_SSH_KEY root@YOUR_SERVER_IP_ADDRESS
 # Example:
 ssh -i ~/.ssh/user root@20.21.03.01
 # Type 'yes' to add the server key fingerprint to your known hosts
-
-# Try to log in again if you got error 'Broken pipe'. 
-
-# If you got another error, then read the troubleshooting section below.
 ```
+
+Try to log in again if you got error 'Broken pipe'. 
+
+If you got another error, then read the troubleshooting section below.
 
 #### SSH Troubleshooting
 
 Clean known hosts after rebuild (optional).
 
+Skip this step if you've never logged into your server before.
+
+Note: if you rebuilt a server, don't forget to clean `known_hosts`
+from old key fingerprints before trying to SSH into your server
+because your server key fingerprint has changed after rebuild.
+
 ```
-# Skip this step if you've never logged into your server before.
-# NOTE: If you rebuilt a server, don't forget to clean 'known_hosts'
-# from old key fingerprints before trying to SSH into your server
-# because your server key fingerprint has changed after rebuild.
 # '-R' deletes a pub key of your previous server build.
 ssh-keygen -R YOUR_SERVER_IP_ADDRESS
 # Example:
@@ -107,6 +119,7 @@ ssh-keygen -R 20.21.03.01
 ssh -i ~/.ssh/YOUR_SSH_KEY root@YOUR_SERVER_IP_ADDRESS
 # Example:
 ssh -i ~/.ssh/user root@20.21.03.01
+
 # You should see the following message:
 # The authenticity of host 'YOUR_SERVER_IP_ADDRESS' can't be established.
 # Are you sure you want to continue connecting?
@@ -117,158 +130,213 @@ ssh -i ~/.ssh/user root@20.21.03.01
 
 ---
 
-### Root setup
+### About scripts
 
-Download scripts.
+Please read the following notes before downloading and executing
+the scripts for the initial server setup.
 
-```
-# You should be logged in as 'root', so you can run setup scripts.
-# Download all scripts manually into /root/scripts/ or 'git clone'.
+**Note 1.**
 
-mkdir scripts
-git clone https://github.com/degenrocket/degenrocket-scripts.git scripts/
-
-# Look through all downloaded scripts and compare them to the source
-# to make sure that you didn't download anything malicious.
-# Example:
-nano scripts/initial-server-setup/01-root-setup-ssh-users-ufw-fail2ban.sh
+The first word in the name of the script specifies which user
+should run the script (root, admin, user), e.g.:
 
 ```
+# 03-root-setup-psql-create-db.sh
+# 04-admin-setup-ssl.sh
+# 05-user-setup-pm2.sh
+```
+
+**Note 2.**
+
+If after executing some setup scripts, you've logged out
+of the server and cannot log in as a root to continue,
+then try to log in as a `user` with port `2222`, e.g.:
 
 ```
-# Note 1.
-# The first word in the name of the script specifies which user
-# should run the script (e.g., root, admin, user).
-
-# Note 2.
-# If after executing some setup scripts, you've logged out
-# of the server and cannot log in as a root to continue,
-# then try to log in as a user with port 2222, e.g.:
 ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
+# Don't forget to change 20.21.03.01 to your server IP address
+
 # then switch to an admin (default password: admin)
 su - admin
+
 # then switch to root (use password of an admin, default: admin)
 sudo su - root
-
-# Note 3.
-# Certain errors might stop the execution of some of the scripts.
-# In that case you should try to run the same script again.
-# However, some scripts cannot be executed multiple times due to
-# 'set -euo pipefail' option.
-# Thus, you can try do delete that line and run the script again.
-# If that doesn't help, then try to rebuild the server from scratch.
 ```
 
-Execute scripts 01, 02, 03 from root.
+**Note 3.**
+
+Certain errors might stop the execution of some of the scripts.
+
+In that case you should try to run the same script again.
+
+However, some scripts cannot be executed multiple times due to
+`set -euo pipefail` option.
+
+Thus, you can try do delete that line and run the script again.
+
+If that doesn't help, then try to rebuild the server from scratch.
+
+---
+
+### Root setup
+
+You should be logged in as `root`, so you can run setup scripts.
+
+Download all scripts manually into `/root/scripts/` or using `git clone`.
 
 ```
-# The following script will:
-# Create a user without privileges
-# Set a password for a user (default: user)
-# Create an admin with privileges
-# Set a password for an admin (default: admin)
-# Copy authorized SSH keys from root to a user
-# Change SSH port (default new port: 2222)
-# Disable SSH root login
-# Disable SSH password authentication
-# Configure UFW firewall to allow SSH, ftp, http, https
-# Install and enable fail2ban
+mkdir scripts
+git clone https://github.com/degenrocket/degenrocket-scripts.git scripts/
+```
+
+Look through all downloaded scripts and compare them to the source
+to make sure that you didn't download anything malicious.
+
+```
+# Example:
+nano scripts/initial-server-setup/01-root-setup-ssh-users-ufw-fail2ban.sh
+```
+
+#### Execute scripts 01, 02, 03 from `root`.
+
+```
 bash scripts/initial-server-setup/01-root-setup-ssh-users-ufw-fail2ban.sh
+```
 
-# The following script will:
-# Update the operating system
-# Install and configure postgresql
-# Install NVM
-# Update npm
-# Install required node version
-# Install and configure Nginx
+The script above will:
+* Create a user without privileges
+* Set a password for a user (default: user)
+* Create an admin with privileges
+* Set a password for an admin (default: admin)
+* Copy authorized SSH keys from root to a user
+* Change SSH port (default new port: 2222)
+* Disable SSH root login
+* Disable SSH password authentication
+* Configure UFW firewall to allow SSH, ftp, http, https
+* Install and enable fail2ban
+
+```
 bash scripts/initial-server-setup/02-root-setup-apt-postgres-npm-nginx.sh
+```
 
-# The following script will:
-# Create a new postgres user (default: dbuser)
-# Set a password for a new user (default: dbuser)
-# Create a new database (default: news_database) owned by a new user 
-# Create required database tables
+The script above will:
+* Update the operating system
+* Install and configure postgresql
+* Install NVM
+* Update npm
+* Install required node version
+* Install and configure Nginx
+
+```
 bash scripts/initial-server-setup/03-root-setup-psql-create-db.sh
 ```
+
+The script above will:
+* Create a new postgres user (default: dbuser)
+* Set a password for a new user (default: dbuser)
+* Create a new database (default: news_database) owned by a new user 
+* Create required database tables
 
 ---
 
 ### Admin setup
 
+Switch to an admin to execute the next script.
+
 ```
-# Switch to an admin to execute the next script.
 # Default password is 'admin'.
 su - admin
+```
 
-# There should already be a folder with scripts.
-# If not, copy-paste the script manually, and then execute.
-# The following script will:
-# Ask for your domain name (e.g., degenrocket.space)
-# Install snapd
-# Install Letsencrypt's certbot
-# Request an SSL certificate (for HTTPS connection)
-# Test auto-renewal
-# Note: this script requires sudo (default password: admin)
+There should already be a folder with latest scripts.
+
+If not, copy-paste the script manually or use `git clone`, and then execute:
+
+```
 sudo bash scripts/initial-server-setup/04-admin-setup-ssl.sh
 ```
+
+Note: this script requires sudo (default password: admin)
+
+The script above will:
+* Ask for your domain name (e.g., degenrocket.space)
+* Install snapd
+* Install Letsencrypt's certbot
+* Request an SSL certificate (for HTTPS connection)
+* Test auto-renewal of a certificate
+
 
 ---
 
 ### User setup
 
-Instal the app.
+Now switch to a user to execute final scripts.
 
 ```
-# Now switch to a user to execute final scripts.
 # Default password is 'user'.
 su - user
+```
 
-# There should already be a folder with scripts.
-# If not, copy-paste the scripts manually, and then execute.
-# The following script will:
-# Install pm2
-# Add 'pm2 resurrect' to cron jobs to start apps after each reboot
+There should already be a folder with scripts.
+
+If not, copy-paste the script manually or use `git clone`, and then execute:
+
+```
 bash scripts/initial-server-setup/05-user-setup-pm2.sh
+```
 
-# The following script will:
-# Create folders to download the app
-# Download the app with git
-# Install dependencies
+The script above will:
+* Install pm2
+* Add `pm2 resurrect` to cron jobs to start apps after each reboot
+
+Next, we can finally instal the app.
+
+```
 bash scripts/initial-server-setup/06-user-setup-git.sh
 ```
+
+The following script will:
+* Create folders to download the app
+* Download the app with git
+* Install dependencies
 
 ---
 
 ### Customize the app
 
+Adjust `backend/.env` if you've changed default database user or password
+
 ```
-# Adjust backend/.env if you've changed default database user or password
 nano ~/apps/degenrocket/backend/.env
+```
 
-# Set app name, social media links and other options in frontend/.env
+Set app name, social media links and other options in `frontend/.env`
+
+```
 nano ~/apps/degenrocket/frontend/.env
+```
 
-# Make sure API_URL is set properly in frontend/.env.
-# Some examples:
+Make sure `API_URL` is set properly in `frontend/.env`
+
+Some examples:
+
+```
 # Production with SSL certificate (https) and Nginx
 API_URL=https://degenrocket.space
 # Testing in VM with Nginx (port forwarding)
 API_URL=http://192.168.122.200
 # Testing locally without Nginx
 API_URL=http://localhost:5000
+```
 
-# Fill in your social media and other links in frontend/.env.
+Copy-paste your logos into the `public/` folder with following names.
 
-# Change custom files: intro, contacts (optional)
-nano ~/apps/degenrocket/frontend/components/custom/contacts.vue
-nano ~/apps/degenrocket/frontend/components/custom/intro.vue
+(recommented sizes are 100x100, 192x192, 512x512) 
 
-# Copy-paste your logos into public folder with following names:
+```
 frontend/public/favicon.ico
 frontend/public/pwa-192x192.png
 frontend/public/pwa-512x512.png
-
 ```
 
 ---
@@ -294,31 +362,35 @@ pm2 save
 
 ### Test the app
 
+Go to your domain or IP address in the browser and test the app.
+
+There are no default posts in database, so try to create a new post.
+
+Troubleshooting: after getting an SSL certificate, don't forget
+to set a proper `https` API domain in `frontend/.env`.
+
+Finally, reboot the system to test pm2 auto-startup.
+The app should automatically start after reboot.
+
 ```
-# Go to your domain or IP address in the browser and test the app.
-# There are no default posts in database, so try to create a new post.
-
-# Troubleshooting: after getting an SSL certificate, don't forget
-# to set a proper HTTPS API domain in frontend/.env
-
-# Reboot the system to test pm2 auto-startup
-# The app should automatically start after reboot
 systemctl reboot -i
-# Warning: rebooting the system will log you out of the server,
-# so it's recommended to test your SSH connection from another
-# terminal before rebooting the system.
-# If you lock yourself out of the system without any chance to log in,
-# you'll need to rebuild the server and start the setup process again.
 ```
+
+*Warning: rebooting the system will log you out of the server,
+so it's recommended to test your SSH connection from another
+terminal before rebooting the system.
+If you lock yourself out of the system without any chance to log in,
+you'll need to rebuild the server and start the setup process again.*
 
 ---
 
 ### Passwords
 
+**IMPORTANT!**
+
 ```
-# IMPORTANT!
 # SSH into the server as a user
-# Switch to an admin
+# Switch to an admin (default password: admin)
 su - admin
 
 # Change passwords for a user and admin
@@ -330,23 +402,34 @@ sudo passwd admin
 
 ### Home machine
 
-```
-# Test SSH
-# It's recommended to SSH into the server from another terminal,
-# so you can troubleshoot your SSH configuration if you won't be able
-# to log in as a user with a new port.
-# You have to speficy a new SSH port (default: 2222)
-# and a new user, because root login is disabled.
-# Example:
-ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
+**Test SSH**
 
-# You can also add this to ~/.ssh/config on your home machine:
+It's recommended to SSH into the server from another terminal,
+so you can troubleshoot your SSH configuration if you won't be able
+to log in as a user with a new port.
+
+You have to speficy a new SSH port (default: `2222`)
+and a new user, because root login is disabled.
+
+Example:
+
+```
+# Don't forget to change '20.21.03.01' to your server IP address
+ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
+```
+
+You can also add this to `~/.ssh/config` on your home machine:
+
+```
+# Don't forget to change '20.21.03.01' to your server IP address
 Host my-server
   Hostname 20.21.03.01
   Port 2222
   User user
-# Don't forget to change '20.21.03.01' to your server IP address
+```
 
-# You should now be able to SSH into your server with this command:
+You should now be able to SSH into your server with this command:
+
+```
 ssh my-server
 ```
