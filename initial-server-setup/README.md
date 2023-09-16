@@ -339,18 +339,103 @@ frontend/public/pwa-192x192.png
 frontend/public/pwa-512x512.png
 ```
 
+There are different ways how to upload files to the server.
+
+##### Upload with SFTP
+
+Open the folder on your **home machine** that contains logos, e.g.:
+
+```shell
+cd ~/Documents/degenrocket/mylogos
+```
+
+Create an SFTP connection with your server
+
+```shell
+sftp -P YOUR_PORT -i ~/.ssh/YOUR_SSH_KEY user@YOUR_SERVER_IP_ADDRESS
+# Example:
+sftp -P 2222 -i ~/.ssh/user user@20.21.03.01
+```
+
+*Note: SSH uses `-p`, while SFTP uses capital `-P` to specify a custom port.
+The location of `-P` is also important because you cannot add it at the end
+of the command after the destination address like when using SSH.*
+
+After logging into your server, choose the destination folder for logos
+
+```shell
+cd apps/degenrocket/frontend/public
+```
+
+Verify that you're in the right folder with `pwd`
+
+```shell
+pwd
+```
+
+The output should look something like this:
+
+```shell
+Remote working directory: /home/user/apps/degenrocket/frontend/public
+```
+
+Copy all files from home `mylogos` folder to server `public` folder
+
+```shell
+put *
+```
+
+Alternatively, you can copy files one by one
+
+```shell
+put favicon.ico
+put pwa-192x192.png
+put pwa-512x512.png
+```
+
+Check that all necessary logos were copied with `ls -1`
+
+```shell
+ls -1
+```
+
+At the time of writing this guide, the current version of the app
+contains examples and logos in the `public` folder, so the output of
+`ls -1` after transferring custom logos looks like this: 
+
+```shell
+favicon.example.ico
+favicon.ico
+logos
+pwa-192x192.example.png
+pwa-192x192.png
+pwa-512x512.example.png
+pwa-512x512.png
+```
+
+Close the SFTP connection
+
+```shell
+exit
+```
 ---
 
 ### Run the app
 
-```
-# SSH into a server as a user or switch to a user
+SSH into a server as a user or switch to a user
+
+```shell
 su - user
-
-# Start up
+```
+ 
+```shell
+# Start the backend
 cd ~/apps/degenrocket/backend && npm run prod && cd ~/
+# Build and then start the frontend
 cd ~/apps/degenrocket/frontend && npm run build && npm run prod && cd ~/
+```
 
+```shell
 # Check running apps
 pm2 list
 
