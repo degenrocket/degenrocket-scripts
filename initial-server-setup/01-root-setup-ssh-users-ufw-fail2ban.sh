@@ -40,8 +40,12 @@ echo "--------"
 # Add an admin with privileges
 # Privilege group names depend on linux distribution
 # 'sudo' and 'admin' on Debian/Ubuntu:
-useradd --create-home --shell "/bin/bash" "${ADMIN}" --groups sudo
-usermod -aG admin "${ADMIN}"
+# useradd --create-home --shell "/bin/bash" "${ADMIN}" --groups sudo
+# usermod -aG admin "${ADMIN}"
+# Changed the order of groups from sudo/admin to admin/sudo to avoid an error:
+# useradd: group admin exists - if you want to add this user to that group, use -g.
+useradd --create-home --shell "/bin/bash" -g admin "${ADMIN}" 
+usermod -aG sudo "${ADMIN}"
 # Set the temporary password for the user
 # to be equal to his name, e.g.:
 # name: alice, password: alice
