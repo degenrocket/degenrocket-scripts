@@ -70,47 +70,99 @@ ssh-keygen -t ed25519 -C "YOUR_NAME"
 ssh-keygen -t ed25519 -C "user"
 ```
 
-#### Add your SSH .pub to your VPS provider.
+#### Add your SSH .pub to your VPS provider
 
 On Linux SSH .pub is usually located at `~/.ssh/YOUR_NAME.pub`
 
-Copy the content of `YOUR_NAME.pub` to clipboard with a text editor
-or with a `wl-copy` command if wl-clipboard is installed, e.g.:
+Copy the content of `YOUR_NAME.pub` to clipboard with a text editor, e.g.:
+
+```
+nano ~/.ssh/user.pub
+```
+Or via temrinal, e.g.:
+
+```
+cat ~/.ssh/user.pub
+```
+
+Or with a `wl-copy` command if wl-clipboard is installed, e.g.:
 
 ```
 wl-copy < ~/.ssh/user.pub
 ```
 
-Open your VPS provider and paste your SSH pub key into an SSH box.
+Open your VPS provider and paste your SSH pub key into an SSH form.
 
 If you're testing in VM, then paste into `/root/.ssh/authorized_keys`
 
 Note: it's important to use SSH keys because the password authentication
 will be disabled by one of the following setup scripts.
 
-```
+#### SSH into your server
+
+```shell
 # SSH into your server as root
 ssh -i ~/.ssh/YOUR_SSH_KEY root@YOUR_SERVER_IP_ADDRESS
 # Example:
 ssh -i ~/.ssh/user root@20.21.03.01
-# Type 'yes' to add the server key fingerprint to your known hosts
 ```
 
-Try to log in again if you got error 'Broken pipe'. 
+You should get the following message, type `yes` and press enter
+to add the server key fingerprint to your known hosts.
+
+```shell
+The authenticity of host 'YOUR_SERVER_IP_ADDRESS' can't be established.
+ED25519 key fingerprint is SHA256:YOUR_SERVER_FINGERPRINT.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+```
+
+Sometimes your connection might be closed:
+
+```shell
+Warning: Permanently added 'YOUR_SERVER_IP_ADDRESS' (ED25519) to the list of known hosts.
+Connection closed by YOUR_SERVER_IP_ADDRESS port 22
+```
+
+Simply try to log in again with the same command.
+
+```shell
+# Example:
+ssh -i ~/.ssh/user root@20.21.03.01
+```
+
+
+Note: try to log in again if you got error 'Broken pipe'. 
 
 If you got another error, then read the troubleshooting section below.
 
 #### SSH Troubleshooting
 
-Clean known hosts after rebuild (optional).
+**Clean known hosts after rebuild**
 
-Skip this step if you've never logged into your server before.
+*Note: skip this step if you've never logged into your server before.*
 
-Note: if you rebuilt a server, don't forget to clean `known_hosts`
+Sometimes you can mess up the setup process, so it might be easier
+to rebuild your server and start the setup process from the scratch.
+However, you'll get an error when trying to SSH into a new server.
+
+```shell
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ED25519 key sent by the remote host is
+SHA256:YOUR_SERVER_FINGERPRINT.
+Please contact your system administrator.
+```
+
+In that case, don't forget to clean the `~/.ssh/known_hosts` file
 from old key fingerprints before trying to SSH into your server
 because your server key fingerprint has changed after rebuild.
 
-```
+```shell
 # '-R' deletes a pub key of your previous server build.
 ssh-keygen -R YOUR_SERVER_IP_ADDRESS
 # Example:
@@ -146,6 +198,9 @@ should run the script (root, admin, user), e.g.:
 # 05-user-setup-pm2.sh
 ```
 
+If you created users with different names (e.g., Alice and Bob),
+then 'root' and 'admin' scripts require sudo privileges.
+
 **Note 2.**
 
 If after executing some setup scripts, you've logged out
@@ -170,11 +225,14 @@ Certain errors might stop the execution of some of the scripts.
 In that case you should try to run the same script again.
 
 However, some scripts cannot be executed multiple times due to
-`set -euo pipefail` option.
+`set -euo pipefail` option at the top of the script.
 
 Thus, you can try do delete that line and run the script again.
 
 If that doesn't help, then try to rebuild the server from scratch.
+
+If nothing helps, please create an issue to reach out for help
+(see the **Contacts** section at the bottom of this guide). 
 
 ---
 
@@ -184,22 +242,27 @@ You should be logged in as `root`, so you can run setup scripts.
 
 Download all scripts manually into `/root/scripts/` or using `git clone`.
 
-```
+```shell
+# Create scripts folder
 mkdir scripts
+```
+
+```shell
+# Download all scripts from github into scripts folder
 git clone https://github.com/degenrocket/degenrocket-scripts.git scripts/
 ```
 
 Look through all downloaded scripts and compare them to the source
 to make sure that you didn't download anything malicious.
 
-```
+```shell
 # Example:
 nano scripts/initial-server-setup/01-root-setup-ssh-users-ufw-fail2ban.sh
 ```
 
 #### Execute scripts 01, 02, 03 from `root`.
 
-```
+```shell
 bash scripts/initial-server-setup/01-root-setup-ssh-users-ufw-fail2ban.sh
 ```
 
@@ -215,7 +278,7 @@ The script above will:
 * Configure UFW firewall to allow SSH, ftp, http, https
 * Install and enable fail2ban
 
-```
+```shell
 bash scripts/initial-server-setup/02-root-setup-apt-postgres-npm-nginx.sh
 ```
 
@@ -227,7 +290,7 @@ The script above will:
 * Install required node version
 * Install and configure Nginx
 
-```
+```shell
 bash scripts/initial-server-setup/03-root-setup-psql-create-db.sh
 ```
 
@@ -250,13 +313,17 @@ su - admin
 
 There should already be a folder with latest scripts.
 
-If not, copy-paste the script manually or use `git clone`, and then execute:
+If not, copy-paste the script manually or use `git clone`, and then execute.
+
+*This script will request an SSL certificate for https connection
+and it requires a domain name, so skip this script if you're
+simply testing the app via IP address on in the VM.*
+
+Note: this script requires sudo (default password: admin)
 
 ```
 sudo bash scripts/initial-server-setup/04-admin-setup-ssl.sh
 ```
-
-Note: this script requires sudo (default password: admin)
 
 The script above will:
 * Ask for your domain name (e.g., degenrocket.space)
@@ -518,3 +585,8 @@ You should now be able to SSH into your server with this command:
 ```
 ssh my-server
 ```
+
+### Contacts
+
+[Session](https://getsession.org): `degenrocket`
+
