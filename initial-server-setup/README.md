@@ -565,14 +565,14 @@ and a new user, because root login is disabled.
 
 Example:
 
-```
+```shell
 # Don't forget to change '20.21.03.01' to your server IP address
 ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
 ```
 
 You can also add this to `~/.ssh/config` on your home machine:
 
-```
+```shell
 # Don't forget to change '20.21.03.01' to your server IP address
 Host my-server
   Hostname 20.21.03.01
@@ -582,8 +582,14 @@ Host my-server
 
 You should now be able to SSH into your server with this command:
 
-```
+```shell
 ssh my-server
+```
+
+You can also open an SFTP connection to upload/download files:
+
+```shell
+sftp my-server
 ```
 
 ### Contacts
