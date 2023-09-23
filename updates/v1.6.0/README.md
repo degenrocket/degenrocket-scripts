@@ -208,7 +208,7 @@ IMPORTANT: change frontend and backend variables if needed before proceeding to 
 
 ```
 cd ~/apps/degenrocket/backend && npm install
-cd ~/apps/degenrocket/fronted && npm install && npm run build
+cd ~/apps/degenrocket/frontend && npm install && npm run build
 ```
 
 Since we've added port and pm2-related enviroment variables, we have to delete all previous pm2 app instances of DegenRocket and then spawn new ones. 

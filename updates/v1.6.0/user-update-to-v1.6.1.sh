@@ -16,7 +16,7 @@ cd "${FRONTEND_DIR}" && git reset --hard HEAD && git pull
 # If new environment variables have been added to .env.example,
 # the we should copy missing lines from .env.example to .env
 copy_env() {
-  local ENV_DIR="\$1"
+  local ENV_DIR="$1"
 
   # Read each line from the .env.example file
   while IFS= read -r line; do
