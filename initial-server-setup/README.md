@@ -8,7 +8,7 @@ You don't have to follow this guide if you're an experienced sysadmin or you alr
 
 The large portion of the setup is done via custom scripts, so you mostly need to copy-paste commands into a terminal and wait for the installation process to finish with minimum interactions like typing your domain name.
 
-This instruction has been tested on Ubuntu 22.04.3.
+This instruction has been tested on **Ubuntu 22.04.3**.
 
 Troubleshooting: if you encounter any errors, please create a new issue or send a message to 'degenrocket' on [Session](https://getsession.org).
 
@@ -21,6 +21,8 @@ Troubleshooting: if you encounter any errors, please create a new issue or send 
 We recommend using different hosting providers for diversification reasons.
 That said, some instances are using privacy-focused domain name registrar
 and hosting provider Njalla, established by one of The Pirate Bay founders.
+
+You can choose as low as **1 core CPU** and **1 GB RAM**.
 
 ---
 
