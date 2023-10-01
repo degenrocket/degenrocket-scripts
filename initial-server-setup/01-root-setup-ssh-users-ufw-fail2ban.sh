@@ -54,34 +54,89 @@ COPY_SCRIPTS_FROM_ROOT_TO_USER=true
 COPY_SCRIPTS_FROM_ROOT_TO_ADMIN=true
 
 ################################
-############ USERS #############
-# Add a user without privileges
-useradd --create-home --shell "/bin/bash" "${USER}"
-# Set the temporary password for the user
-# to be equal to his name, e.g.:
-# name: alice, password: alice
-echo "${USER}:${USER}" | chpasswd
+########### GROUPS #############
+# Create 'admin' group if it doesn't exist
+if getent group admin >/dev/null
+then
+    echo "Group 'admin' already exists."
+else
+    echo "Group 'admin' does not exist. Creating it now."
+    sudo groupadd admin
+    # Add the group to the sudoers file
+    echo "Adding 'admin' group to sudoers file"
+    echo "%admin ALL=(ALL:ALL) ALL" | sudo EDITOR='tee -a' visudo
+fi
 
-echo "Created user: ${USER}"
-echo "${USER} groups: $(groups ${USER})"
+################################
+############ USERS #############
+# USER
+# Add a user without privileges
+# Check if user already exists
+if id -u "${USER}" >/dev/null 2>&1; then
+    echo "User ${USER} already exists."
+else
+    useradd --create-home --shell "/bin/bash" "${USER}"
+    echo "Created user: ${USER}"
+    # Set the temporary password for user
+    # to be equal to his name, e.g.:
+    # name: user, password: user
+    echo "${USER}:${USER}" | chpasswd
+fi
+
+echo "${USER} groups are: $(groups ${USER})"
 echo "--------"
 
+# ADMIN
 # Add an admin with privileges
 # Privilege group names depend on linux distribution
 # 'sudo' and 'admin' on Debian/Ubuntu:
-# useradd --create-home --shell "/bin/bash" "${ADMIN}" --groups sudo
-# usermod -aG admin "${ADMIN}"
-# Changed the order of groups from sudo/admin to admin/sudo to avoid an error:
-# useradd: group admin exists - if you want to add this user to that group, use -g.
-useradd --create-home --shell "/bin/bash" -g admin "${ADMIN}" 
-usermod -aG sudo "${ADMIN}"
-# Set the temporary password for the user
-# to be equal to his name, e.g.:
-# name: alice, password: alice
-echo "${ADMIN}:${ADMIN}" | chpasswd
 
-echo "Created user: ${ADMIN}"
-echo "${ADMIN} groups: $(groups ${ADMIN})"
+# Check if admin already exists
+if id -u "${ADMIN}" >/dev/null 2>&1; then
+    echo "User ${ADMIN} already exists."
+else
+    # Changed the order of groups from sudo/admin to admin/sudo to avoid an error:
+    # ERROR: useradd: group admin exists - if you want to add this user to that group, use -g.
+    # Old order:
+    # useradd --create-home --shell "/bin/bash" "${ADMIN}" --groups sudo
+    # usermod -aG admin "${ADMIN}"
+    # New order:
+    useradd --create-home --shell "/bin/bash" -g admin "${ADMIN}" 
+    usermod -aG sudo "${ADMIN}"
+    echo "Created user: ${ADMIN}"
+    # Set the temporary password for admin
+    # to be equal to his name, e.g.:
+    # name: admin, password: admin
+    echo "${ADMIN}:${ADMIN}" | chpasswd
+fi
+
+# If admin name is not 'admin', but something else (e.g. 'bob'),
+# then we need to add 'bob' to a group 'bob' for other scripts
+# to work properly, especially commands like 'chown bob:bob file'.
+# Add admin to a group with his name.
+# Check if admin is already in the group with his name
+if getent group "${ADMIN}" | grep -qw "${ADMIN}"; then
+    echo "${ADMIN} is already in the group '${ADMIN}'"
+else
+    echo "${ADMIN} is not in the group '${ADMIN}'"
+
+    echo "Creating a group called '${ADMIN}'..."
+
+    # Create a group with same name as admin if it doesn't exist
+    if getent group "${ADMIN}" >/dev/null
+    then
+        echo "Group '${ADMIN}' already exists."
+    else
+        echo "Group '${ADMIN}' does not exist. Creating it now."
+        sudo groupadd "${ADMIN}"
+    fi
+
+    # add admin to the group with the same name
+    usermod -aG ${ADMIN} ${ADMIN}
+    echo "${ADMIN} has been added to the group '${ADMIN}'"
+fi
+
+echo "${ADMIN} groups are: $(groups ${ADMIN})"
 echo "--------"
 
 ################################
@@ -91,6 +146,7 @@ user_home_directory="$(eval echo ~${USER})"
 mkdir --parents "${user_home_directory}/.ssh"
 # Change file ownership from root to user
 chown --recursive "${USER}":"${USER}" "${user_home_directory}/.ssh"
+echo "SSH directory for ${USER} is created at: ${user_home_directory}/.ssh"
 
 # Create SSH directory for admin
 # By default, it's not gonna be used
@@ -98,6 +154,7 @@ admin_home_directory="$(eval echo ~${ADMIN})"
 mkdir --parents "${admin_home_directory}/.ssh"
 # Change file ownership from root to admin
 chown --recursive "${ADMIN}":"${ADMIN}" "${admin_home_directory}/.ssh"
+echo "SSH directory for ${ADMIN} is created at: ${admin_home_directory}/.ssh"
 
 # Copy SSH key from root to user if requested above
 if [ "${COPY_SSH_KEYS_FROM_ROOT_TO_USER}" = true ]; then
@@ -111,7 +168,7 @@ if [ "${COPY_SSH_KEYS_FROM_ROOT_TO_USER}" = true ]; then
     chown --recursive "${USER}":"${USER}" "${user_home_directory}/.ssh"
 fi
 
-# Copy SSH key from root to admin if requested
+# Copy SSH key from root to admin if requested above
 if [ "${COPY_SSH_KEYS_FROM_ROOT_TO_ADMIN}" = true ]; then
     cp /root/.ssh/authorized_keys "${admin_home_directory}/.ssh"
     # Adjust SSH files permissions
@@ -129,10 +186,12 @@ echo "root is locked"
 
 # Back up SSH config
 cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
-echo "ssh is backed"
+echo "SSH config is backed to /etc/ssh/sshd_config.bak"
 
 # Change SSH port because many bots scan default port 22.
-# Port can be changed to any number between 1024 and 65535.
+# Port can be changed to a number between 1024 and 65535.
+# Make sure a new port doesn't overlap with ports used by
+# other services. Check used ports with 'netstat -tuln'.
 # Disable root login and password authentication.
 echo "Port ${NEW_SSH_PORT}" >> /etc/ssh/sshd_config
 echo "SSH port is changed"
