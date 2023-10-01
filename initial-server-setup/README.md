@@ -10,13 +10,13 @@ The large portion of the setup is done via custom scripts, so you mostly need to
 
 This instruction has been tested on **Ubuntu 22.04.3**.
 
-Troubleshooting: if you encounter any errors, please create a new issue or send a message to 'degenrocket' on [Session](https://getsession.org).
+Troubleshooting: if you encounter any errors, please create a new issue or send a message to `degenrocket` on [Session](https://getsession.org).
 
 ---
 
 ### VPS
 
-##### Rent VPS Ubuntu 22.04.
+##### Rent VPS Ubuntu 22.04
 
 We recommend using different hosting providers for diversification reasons.
 That said, some instances are using privacy-focused domain name registrar
@@ -65,7 +65,7 @@ For example, `IPV6=yes` in `/etc/default/ufw`
 
 Generate and upload an SSH key to your hosting provider.
 
-```
+```shell
 # Generate SSH key with a comment "YOUR_NAME" on your home machine.
 ssh-keygen -t ed25519 -C "YOUR_NAME"
 # Example:
@@ -78,18 +78,18 @@ On Linux SSH .pub is usually located at `~/.ssh/YOUR_NAME.pub`
 
 Copy the content of `YOUR_NAME.pub` to clipboard with a text editor, e.g.:
 
-```
+```shell
 nano ~/.ssh/user.pub
 ```
 Or via temrinal, e.g.:
 
-```
+```shell
 cat ~/.ssh/user.pub
 ```
 
 Or with a `wl-copy` command if wl-clipboard is installed, e.g.:
 
-```
+```shell
 wl-copy < ~/.ssh/user.pub
 ```
 
@@ -112,7 +112,7 @@ ssh -i ~/.ssh/user root@20.21.03.01
 You should get the following message, type `yes` and press enter
 to add the server key fingerprint to your known hosts.
 
-```shell
+```
 The authenticity of host 'YOUR_SERVER_IP_ADDRESS' can't be established.
 ED25519 key fingerprint is SHA256:YOUR_SERVER_FINGERPRINT.
 This key is not known by any other names
@@ -121,7 +121,7 @@ Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
 
 Sometimes your connection might be closed:
 
-```shell
+```
 Warning: Permanently added 'YOUR_SERVER_IP_ADDRESS' (ED25519) to the list of known hosts.
 Connection closed by YOUR_SERVER_IP_ADDRESS port 22
 ```
@@ -148,7 +148,7 @@ Sometimes you can mess up the setup process, so it might be easier
 to rebuild your server and start the setup process from the scratch.
 However, you'll get an error when trying to SSH into a new server.
 
-```shell
+```
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -194,7 +194,7 @@ the scripts for the initial server setup.
 The first word in the name of the script specifies which user
 should run the script (root, admin, user), e.g.:
 
-```
+```shell
 # 03-root-setup-psql-create-db.sh
 # 04-admin-setup-ssl.sh
 # 05-user-setup-pm2.sh
@@ -209,7 +209,7 @@ If after executing some setup scripts, you've logged out
 of the server and cannot log in as a root to continue,
 then try to log in as a `user` with port `2222`, e.g.:
 
-```
+```shell
 ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
 # Don't forget to change 20.21.03.01 to your server IP address
 
@@ -235,6 +235,44 @@ If that doesn't help, then try to rebuild the server from scratch.
 
 If nothing helps, please create an issue to reach out for help
 (see the **Contacts** section at the bottom of this guide). 
+
+---
+
+### Default directory and file structure
+
+Here is the default directory and file structure that you'll have
+after executing scripts for the automated initial server setup.
+
+You can change these paths in the `scripts/.env` file.
+
+```
+root (manages initial server setup)
+├── .ssh
+│   └── authorized_keys (for the first connect only)
+└── scripts (degenrocket-scripts.git)
+    └── .env (this .env will be copied to user and admin)
+
+home
+├── user (npm, pm2, manages apps)
+│   ├── .ssh
+│   │   └── authorized_keys (for regular connections)
+│   ├── apps
+│   │   └── degenrocket
+│   │       ├── frontend (degenrocket-web.git)
+│   │       │   └── .env
+│   │       └── backend (degenrocket-server.git)
+│   │           └── .env
+│   ├── backups
+│   │   └── database (copied from admin during db backup)
+│   └── scripts (degenrocket-scripts.git)
+│       └── .env (copied from root during initial server setup)
+│
+└── admin (sudo, ssl, manages OS)
+    ├── backups
+    │   └── database (generated during database backups)
+    └── scripts (degenrocket-scripts.git)
+        └── .env (copied from root during initial server setup)
+```
 
 ---
 
@@ -308,7 +346,7 @@ The script above will:
 
 Switch to an admin to execute the next script.
 
-```
+```shell
 # Default password is 'admin'.
 su - admin
 ```
@@ -323,7 +361,7 @@ simply testing the app via IP address on in the VM.*
 
 Note: this script requires sudo (default password: admin)
 
-```
+```shell
 sudo bash scripts/initial-server-setup/04-admin-setup-ssl.sh
 ```
 
@@ -341,7 +379,7 @@ The script above will:
 
 Now switch to a user to execute final scripts.
 
-```
+```shell
 # Default password is 'user'.
 su - user
 ```
@@ -350,7 +388,7 @@ There should already be a folder with scripts.
 
 If not, copy-paste the script manually or use `git clone`, and then execute:
 
-```
+```shell
 bash scripts/initial-server-setup/05-user-setup-pm2.sh
 ```
 
@@ -360,7 +398,7 @@ The script above will:
 
 Next, we can finally instal the app.
 
-```
+```shell
 bash scripts/initial-server-setup/06-user-setup-git.sh
 ```
 
@@ -375,13 +413,13 @@ The following script will:
 
 Adjust `backend/.env` if you've changed default database user or password
 
-```
+```shell
 nano ~/apps/degenrocket/backend/.env
 ```
 
 Set app name, social media links and other options in `frontend/.env`
 
-```
+```shell
 nano ~/apps/degenrocket/frontend/.env
 ```
 
@@ -389,7 +427,7 @@ Make sure `API_URL` is set properly in `frontend/.env`
 
 Some examples:
 
-```
+```shell
 # Production with SSL certificate (https) and Nginx
 API_URL=https://degenrocket.space
 # Testing in VM with Nginx (port forwarding)
@@ -444,7 +482,7 @@ pwd
 
 The output should look something like this:
 
-```shell
+```
 Remote working directory: /home/user/apps/degenrocket/frontend/public
 ```
 
@@ -472,7 +510,7 @@ At the time of writing this guide, the current version of the app
 contains examples and logos in the `public` folder, so the output of
 `ls -1` after transferring custom logos looks like this: 
 
-```shell
+```
 favicon.example.ico
 favicon.ico
 logos
@@ -526,7 +564,7 @@ to set a proper `https` API domain in `frontend/.env`.
 Finally, reboot the system to test pm2 auto-startup.
 The app should automatically start after reboot.
 
-```
+```shell
 systemctl reboot -i
 ```
 
@@ -542,7 +580,7 @@ you'll need to rebuild the server and start the setup process again.*
 
 **IMPORTANT!**
 
-```
+```shell
 # SSH into the server as a user
 # Switch to an admin (default password: admin)
 su - admin
