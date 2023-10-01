@@ -10,16 +10,50 @@ set -euo pipefail
 # $nrconf{restart} = 'l';
 sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
 # Another approach to stop prompts (currently disabled): 
-# export NEEDRESTART_MODE=a
-# export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
 
-USER="user"
-ADMIN="admin"
+# Import environment variables:
+# USER
+# ADMIN
+# POSTGRES_USER
+# POSTGRES_DATABASE
+# POSTGRES_PORT
+# Find the absolute path to this script
+THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ENV_FILE="${THIS_SCRIPT_DIR}/../.env"
+# Source .env file only if it exists
+test -f "${ENV_FILE}" && source "${ENV_FILE}"
 
-POSTGRES_USER="dbuser"
-POSTGRES_PASSWORD="dbuser"
-POSTGRES_DATABASE="news_database"
-POSTGRES_PORT="5432"
+# Assign a default value if it is unset or empty
+USER="${USER:-user}"
+ADMIN="${ADMIN:-admin}"
+POSTGRES_USER="${POSTGRES_USER:-dbuser}"
+POSTGRES_DATABASE="${POSTGRES_DATABASE:-news_database}"
+POSTGRES_PORT="${POSTGRES_PORT:-5432}"
+
+# Temporary set a password to be equal to a database username,
+# it should be manually changed after the initial server setup.
+# Default password: dbuser
+POSTGRES_PASSWORD="${POSTGRES_USER:-dbuser}"
+
+# When .env is empty or doesn't exist, then USER
+# is set to 'root' when executed from 'root'.
+# Thus, we should explicitly set USER to its default
+# value of 'user' if its value is 'root'.
+if [ "${USER}" == "root" ]; then
+    USER="user"
+fi
+
+echo "Variables:"
+echo "USER: ${USER}"
+echo "ADMIN: ${ADMIN}"
+echo "POSTGRES_USER: ${POSTGRES_USER}"
+echo "POSTGRES_DATABASE: ${POSTGRES_DATABASE}"
+echo "POSTGRES_PORT: ${POSTGRES_PORT}"
+echo "POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}"
+echo "----------------------"
+echo "Starting the script..."
 
 # Create postgres account for admin without privileges
 su - postgres bash -c "psql -c \"CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';\""

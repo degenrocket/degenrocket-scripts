@@ -10,12 +10,38 @@ set -euo pipefail
 # $nrconf{restart} = 'l';
 sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
 # Another approach to stop prompts (currently disabled): 
-# export NEEDRESTART_MODE=a
-# export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+export DEBIAN_FRONTEND=noninteractive
 
-USER="user"
-ADMIN="admin"
-NEW_SSH_PORT="2222"
+# Import environment variables:
+# USER
+# ADMIN
+# NEW_SSH_PORT
+# Find the absolute path to this script
+THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ENV_FILE="${THIS_SCRIPT_DIR}/../.env"
+# Source .env file only if it exists
+test -f "${ENV_FILE}" && source "${ENV_FILE}"
+
+# Assign a default value if it is unset or empty
+USER="${USER:-user}"
+ADMIN="${ADMIN:-admin}"
+NEW_SSH_PORT="${NEW_SSH_PORT:-2222}"
+
+# When .env is empty or doesn't exist, then USER
+# is set to 'root' when executed from 'root'.
+# Thus, we should explicitly set USER to its default
+# value of 'user' if its value is 'root'.
+if [ "${USER}" == "root" ]; then
+    USER="user"
+fi
+
+echo "Variables:"
+echo "USER: ${USER}"
+echo "ADMIN: ${ADMIN}"
+echo "NEW_SSH_PORT: ${NEW_SSH_PORT}"
+echo "----------------------"
+echo "Starting the script..."
 
 # By default, SSH keys are only copied to a user without privileges,
 # so an adversary will not get a sudo access if SSH keys leak. 

@@ -2,19 +2,65 @@
 # pipefail stops execution if encounters any errors
 # set -euo pipefail
 
-USER="user"
-ADMIN="admin"
-APP_NAME="degenrocket"
+# Import environment variables:
+# USER
+# ADMIN
+# APP_NAME
+# ALL_APPS_FOLDER
+# BACKEND_DIR
+# FRONTEND_DIR
+# POSTGRES_USER
+# POSTGRES_DATABASE
+# POSTGRES_PORT
+# Find the absolute path to this script
+THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ENV_FILE="${THIS_SCRIPT_DIR}/../.env"
+# Source .env file only if it exists
+test -f "${ENV_FILE}" && source "${ENV_FILE}"
 
-ALL_APPS_FOLDER="apps"
-# APP_FOLDER="${ALL_APPS_FOLDER}/$(date +%Y%m%d)"
+# Assign a default value if it is unset or empty
+USER="${USER:-user}"
+ADMIN="${ADMIN:-admin}"
+APP_NAME="${APP_NAME:-degenrocket}"
+ALL_APPS_FOLDER="${ALL_APPS_FOLDER:-apps}"
+POSTGRES_USER="${POSTGRES_USER:-dbuser}"
+POSTGRES_DATABASE="${POSTGRES_DATABASE:-news_database}"
+POSTGRES_PORT="${POSTGRES_PORT:-5432}"
+
+# Temporary set a password to be equal to a database username,
+# it should be manually changed after the initial server setup.
+# Default password: dbuser
+POSTGRES_PASSWORD="${POSTGRES_USER:-dbuser}"
+
 APP_FOLDER="${ALL_APPS_FOLDER}/${APP_NAME}"
-FRONTEND_FOLDER="${APP_FOLDER}/frontend"
-BACKEND_FOLDER="${APP_FOLDER}/backend"
 
-echo "${APP_FOLDER}"
-echo "${FRONTEND_FOLDER}"
-echo "${BACKEND_FOLDER}"
+# Use environment variables FRONTEND_DIR, BACKEND_DIR
+# from .env, otherwise use default ./backend, ./frontend
+BACKEND_FOLDER="${BACKEND_DIR:-${APP_FOLDER}/backend}"
+FRONTEND_FOLDER="${FRONTEND_DIR:-${APP_FOLDER}/frontend}"
+
+# When .env is empty or doesn't exist, then USER
+# is set to 'root' when executed from 'root'.
+# Thus, we should explicitly set USER to its default
+# value of 'user' if its value is 'root'.
+if [ "${USER}" == "root" ]; then
+    USER="user"
+fi
+
+echo "Variables:"
+echo "USER: ${USER}"
+echo "ADMIN: ${ADMIN}"
+echo "APP_NAME: ${APP_NAME}"
+echo "ALL_APPS_FOLDER: ${ALL_APPS_FOLDER}"
+echo "POSTGRES_USER: ${POSTGRES_USER}"
+echo "POSTGRES_DATABASE: ${POSTGRES_DATABASE}"
+echo "POSTGRES_PORT: ${POSTGRES_PORT}"
+echo "POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}"
+echo "APP_FOLDER: ${APP_FOLDER}"
+echo "BACKEND_FOLDER: ${BACKEND_FOLDER}"
+echo "FRONTEND_FOLDER: ${FRONTEND_FOLDER}"
+echo "----------------------"
+echo "Starting the script..."
 
 # Create folders for git
 bash -c "mkdir -p ${FRONTEND_FOLDER} && mkdir -p ${BACKEND_FOLDER}"
@@ -78,6 +124,32 @@ else
     sed -i "s/https/http/g" ${FRONTEND_FOLDER}/.env
 fi
 
+echo "-----------------"
+
+update_env_var() {
+  local var_name="$1"
+  local var_value="${!var_name}"
+  local env_dir="$2"
+  echo "Updating environment variables."
+  echo "File: ${env_dir}/.env"
+  echo "Variable name: ${var_name}"
+  
+  if [ -n "${var_value}" ]; then
+    echo "Variable value: ${var_value}"
+    # Change the whole line that starts with the variable name
+    sed -i "/${var_name}=/s/.*/${var_name}=${var_value}/" "${env_dir}/.env"
+  else
+    echo "Variable ${var_name} is empty"
+  fi
+}
+
+update_env_var POSTGRES_USER ${BACKEND_FOLDER}
+update_env_var POSTGRES_DATABASE ${BACKEND_FOLDER}
+update_env_var POSTGRES_PORT ${BACKEND_FOLDER}
+update_env_var POSTGRES_PASSWORD ${BACKEND_FOLDER}
+
 echo "Installation is done."
-echo "Before building the app, adjust customization options in"
+echo "Before building the frontend, adjust customization options in:"
 echo "${FRONTEND_FOLDER}/.env"
+echo "Also check backend environment variables:"
+echo "${BACKEND_FOLDER}/.env"

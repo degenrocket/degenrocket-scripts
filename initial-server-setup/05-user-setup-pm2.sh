@@ -1,9 +1,33 @@
 #!/bin/bash
 # pipefail stops execution if encounters any errors
-# set -euo pipefail
+set -euo pipefail
 
-USER="user"
-ADMIN="admin"
+# Import environment variables:
+# USER
+# ADMIN
+# Find the absolute path to this script
+THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+ENV_FILE="${THIS_SCRIPT_DIR}/../.env"
+# Source .env file only if it exists
+test -f "${ENV_FILE}" && source "${ENV_FILE}"
+
+# Assign a default value if it is unset or empty
+USER="${USER:-user}"
+ADMIN="${ADMIN:-admin}"
+
+# When .env is empty or doesn't exist, then USER
+# is set to 'root' when executed from 'root'.
+# Thus, we should explicitly set USER to its default
+# value of 'user' if its value is 'root'.
+if [ "${USER}" == "root" ]; then
+    USER="user"
+fi
+
+echo "Variables:"
+echo "USER: ${USER}"
+echo "ADMIN: ${ADMIN}"
+echo "----------------------"
+echo "Starting the script..."
 
 bash -c "npm install pm2 -g && pm2 update"
 
@@ -58,3 +82,4 @@ crontab -l
 # Warning: paths to node/pm2 contain a version, so we need to
 # update them when packages are updated.
 # For example, we can run this script after each node/pm2 update.
+# Alternatively, we can create a cron job to update node/pm2 paths hourly.
