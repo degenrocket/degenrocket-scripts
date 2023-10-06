@@ -81,6 +81,65 @@ function git_operations() {
 
     # Delete any local git changes to master and download a new version
     git -C "$path" reset --hard HEAD && git -C "$path" pull
+}
+
+git_operations "${BACKEND_DIR}"
+git_operations "${FRONTEND_DIR}"
+
+function env_operations() {
+    local path="$1"
+    echo "Starting env operations for ${path}"
+
+    local env="${path}/.env"
+    local env_bak="${path}/.env.bak"
+    local env_example="${path}/.env.example"
+
+    echo "Make .env backup to: ${env_bak}"
+    echo "Copying from env: ${env}"
+    echo "Copying to env: ${env_bak}"
+    cp "${env}" "${env_bak}"
+
+    echo "Copy an example env to a regular env"
+    echo "Copying from env: ${env_example}"
+    echo "Copying to env: ${env}"
+    cp "${env_example}" "${env}"
+
+    # Now we need to merge values from the backup env
+    # into a new env which is made from the example env.
+    # The function below works properly if the environment
+    # variables from the original env file contain only
+    # one-line values.
+    # Thus, the usage of multi line values is discouraged. 
+    local env_from="${env_bak}"
+    local env_to="${env}"
+
+    echo "Merging from: ${env_bak}"
+    echo "Merging to: ${env}"
+
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^# || -z "$line" ]]; then
+            # Skip comments and empty lines
+            continue
+        fi
+        # Sometimes a value of an environment variable contains symbol "=",
+        # so there are multiple "=" symbols on one line.
+        # Thus, we need to extract key and value based on the first '='.
+        # Key is the shortest string before '='.
+        key="${line%%=*}"
+        # Value is the longest string after '='.
+        value="${line#*=}"
+        # Update the value in the destination file
+        sed -i "/^$key=/c\\$key=$value" "${env_to}"
+    done < "${env_from}"
+}
+
+env_operations "${BACKEND_DIR}"
+env_operations "${FRONTEND_DIR}"
+
+function npm_operations() {
+    local path="$1"
+
+    echo "Starting npm operations for ${path}"
 
     # Install npm packages if packages have been changed
     npm install --prefix "${path}"
@@ -95,8 +154,8 @@ function git_operations() {
     fi
 }
 
-git_operations "${BACKEND_DIR}"
-git_operations "${FRONTEND_DIR}"
+npm_operations "${BACKEND_DIR}"
+npm_operations "${FRONTEND_DIR}"
 
 # Sometimes after 'pm2 delete all' the instances like
 # 'prod-back@1.6.1' will show up after running 'pm2 list',
