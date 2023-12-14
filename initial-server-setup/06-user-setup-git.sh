@@ -85,7 +85,7 @@ cp ${BACKEND_FOLDER}/.env.example ${BACKEND_FOLDER}/.env
 cp ${FRONTEND_FOLDER}/.env.example ${FRONTEND_FOLDER}/.env
 
 ENV_PROMPT_TEXT="
-We need to change API_HOST and API_URL in frontend/.env
+We need to change API_URL in frontend/.env
 Please enter your domain name (e.g., degenrocket.space) below.
 Do not type 'www' or 'https'.
 Alternatively, enter IP address (e.g., 192.168.122.200) if you test in VM.
@@ -101,7 +101,8 @@ if [ -n "${SITE_TLD}" ]; then
     echo "User provided a domain name ${SITE_TLD}, adjusting frontend/.env"
     # Change the whole line that starts with API_URL or API_HOST
     sed -i "/API_URL=/s/.*/API_URL=http:\/\/${SITE_TLD}/" ${FRONTEND_FOLDER}/.env
-    sed -i "/API_HOST=/s/.*/API_HOST=${SITE_TLD}/" ${FRONTEND_FOLDER}/.env
+    # API_HOST environment variable has been deprecated
+    # sed -i "/API_HOST=/s/.*/API_HOST=${SITE_TLD}/" ${FRONTEND_FOLDER}/.env
 else
     echo "User didn't provide a domain name, leaving frontend/.env unchanged"
 fi
