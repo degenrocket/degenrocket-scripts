@@ -14,8 +14,8 @@ export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
 # Import environment variables:
-# USER
-# ADMIN
+# USER_NAME
+# ADMIN_NAME
 # POSTGRES_USER
 # POSTGRES_DATABASE
 # POSTGRES_PORT
@@ -26,8 +26,8 @@ ENV_FILE="${THIS_SCRIPT_DIR}/../.env"
 test -f "${ENV_FILE}" && source "${ENV_FILE}"
 
 # Assign a default value if it is unset or empty
-USER="${USER:-user}"
-ADMIN="${ADMIN:-admin}"
+USER="${USER_NAME:-user}"
+ADMIN="${ADMIN_NAME:-admin}"
 POSTGRES_USER="${POSTGRES_USER:-dbuser}"
 POSTGRES_DATABASE="${POSTGRES_DATABASE:-news_database}"
 POSTGRES_PORT="${POSTGRES_PORT:-5432}"
@@ -36,14 +36,6 @@ POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 # it should be manually changed after the initial server setup.
 # Default password: dbuser
 POSTGRES_PASSWORD="${POSTGRES_USER:-dbuser}"
-
-# When .env is empty or doesn't exist, then USER
-# is set to 'root' when executed from 'root'.
-# Thus, we should explicitly set USER to its default
-# value of 'user' if its value is 'root'.
-if [ "${USER}" == "root" ]; then
-    USER="user"
-fi
 
 echo "Variables:"
 echo "USER: ${USER}"

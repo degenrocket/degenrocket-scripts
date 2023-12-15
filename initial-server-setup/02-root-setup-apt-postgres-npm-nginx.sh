@@ -14,8 +14,8 @@ export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
 
 # Import environment variables:
-# USER
-# ADMIN
+# USER_NAME
+# ADMIN_NAME
 # Find the absolute path to this script
 THIS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 ENV_FILE="${THIS_SCRIPT_DIR}/../.env"
@@ -23,16 +23,8 @@ ENV_FILE="${THIS_SCRIPT_DIR}/../.env"
 test -f "${ENV_FILE}" && source "${ENV_FILE}"
 
 # Assign a default value if it is unset or empty
-USER="${USER:-user}"
-ADMIN="${ADMIN:-admin}"
-
-# When .env is empty or doesn't exist, then USER
-# is set to 'root' when executed from 'root'.
-# Thus, we should explicitly set USER to its default
-# value of 'user' if its value is 'root'.
-if [ "${USER}" == "root" ]; then
-    USER="user"
-fi
+USER="${USER_NAME:-user}"
+ADMIN="${ADMIN_NAME:-admin}"
 
 echo "Variables:"
 echo "USER: ${USER}"

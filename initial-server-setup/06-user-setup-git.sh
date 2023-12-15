@@ -3,8 +3,8 @@
 # set -euo pipefail
 
 # Import environment variables:
-# USER
-# ADMIN
+# USER_NAME
+# ADMIN_NAME
 # APP_NAME
 # ALL_APPS_FOLDER
 # BACKEND_DIR
@@ -19,8 +19,8 @@ ENV_FILE="${THIS_SCRIPT_DIR}/../.env"
 test -f "${ENV_FILE}" && source "${ENV_FILE}"
 
 # Assign a default value if it is unset or empty
-USER="${USER:-user}"
-ADMIN="${ADMIN:-admin}"
+USER="${USER_NAME:-user}"
+ADMIN="${ADMIN_NAME:-admin}"
 APP_NAME="${APP_NAME:-degenrocket}"
 ALL_APPS_FOLDER="${ALL_APPS_FOLDER:-apps}"
 POSTGRES_USER="${POSTGRES_USER:-dbuser}"
@@ -38,14 +38,6 @@ APP_FOLDER="${ALL_APPS_FOLDER}/${APP_NAME}"
 # from .env, otherwise use default ./backend, ./frontend
 BACKEND_FOLDER="${BACKEND_DIR:-${APP_FOLDER}/backend}"
 FRONTEND_FOLDER="${FRONTEND_DIR:-${APP_FOLDER}/frontend}"
-
-# When .env is empty or doesn't exist, then USER
-# is set to 'root' when executed from 'root'.
-# Thus, we should explicitly set USER to its default
-# value of 'user' if its value is 'root'.
-if [ "${USER}" == "root" ]; then
-    USER="user"
-fi
 
 echo "Variables:"
 echo "USER: ${USER}"
