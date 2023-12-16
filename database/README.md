@@ -35,8 +35,8 @@ bash ~/scripts/database/admin-database-backup.sh
 By default backups are created at:
 
 ```
-/home/user/apps/backups/database/news_database_CURRENT_DATE.sql
-/home/admin/apps/backups/database/news_database_CURRENT_DATE.sql
+/home/user/backups/database/news_database_CURRENT_DATE.sql
+/home/admin/backups/database/news_database_CURRENT_DATE.sql
 ```
 
 *Note: you can change default paths in `~/scripts/.env`.*
@@ -44,6 +44,17 @@ By default backups are created at:
 ##### Why execute the database backup script as `admin`?
 
 Ideally, you want to have regular automatic backups to the cloud or at least download them locally. However, if you can't configure an advanced backup process, then backing the database as `admin` will give you an extra copy in the `admin` home folder in case if you mess up `user` folders or if an attacker will be able to get an access to `user` and delete your backups.
+
+#### Restore database
+
+If you want to restore the database from the backup,
+execute the following command from a user or an admin:
+
+```
+psql -h localhost -U dbuser news_database < news_database_20230101.sql
+```
+
+*Note: change `news_database_20230101` to the name of your database backup file, and don't forget to change default db name `news_database`, db username `dbuser`, and db port `5432` if you've used custom values.*
 
 ### TIPS
 
