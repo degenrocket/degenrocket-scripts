@@ -233,7 +233,6 @@ echo "UFW rules are added"
 # with '--force' a user doesn't have to type 'y'
 sudo ufw --force enable
 echo "UFW is configured and enabled"
-echo "Try to SSH from another terminal before closing this session"
 echo "--------"
 
 ################################
@@ -253,6 +252,7 @@ systemctl status fail2ban
 # It scans these logs for patterns and
 # applies the configured rules to ban IP addresses.
 echo "Fail2Ban is configured and enabled"
+echo "Try to SSH from another terminal before closing this session"
 echo "--------"
 
 # Custom passwords are currently disabled, because

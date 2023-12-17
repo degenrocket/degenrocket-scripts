@@ -196,7 +196,7 @@ set -e
 
 # install snapd
 # https://snapcraft.io/docs/installing-snapd
-apt install snapd
+apt-get -y install snapd
 # snap install core
 # snap refresh core
 
