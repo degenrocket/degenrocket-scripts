@@ -14,56 +14,9 @@ Troubleshooting: if you encounter any errors, please create a new issue or send 
 
 ---
 
-### VPS
-
-##### Rent VPS Ubuntu 22.04
-
-We recommend using different hosting providers for diversification reasons.
-That said, some instances are using privacy-focused domain name registrar
-and hosting provider Njalla, established by one of The Pirate Bay founders.
-
-You can choose as low as **1 core CPU** and **1 GB RAM**.
-
----
-
-### DNS
-
-Configure DNS at the dashboard of your VPS provider.
-Add at least 3 records for this script to work without errors:
-
-```
-# your_domain.com
-# www.your_domain.com
-# staging.your_domain.com
-```
-
-Choose Type 'A' for IPv4 addresses.
-
-Choose Type 'AAAA' for IPv6 addresses.
-
-Set Name to your domain name.
-
-Set IPv4 to an IP address of your server.
-
-Choose TTL '3h' or leave it as default.
-
-```
-# Example:
-# Type:A, Name:degenrocket.space, IPv4:20.21.03.01, TTL:3h
-# Type:A, Name:www.degenrocket.space, IPv4:20.21.03.01, TTL:3h
-# Type:A, Name:staging.degenrocket.space, IPv4:20.21.03.01, TTL:3h
-```
-
-Note: if you want to use 'AAAA' to link to an IPv6 address,
-then make sure that your firewall allows IPv6.
-
-For example, `IPV6=yes` in `/etc/default/ufw`
-
----
-
 ### SSH
 
-Generate and upload an SSH key to your hosting provider.
+Generate an SSH key to log into your server without a password.
 
 ```shell
 # Generate SSH key with a comment "YOUR_NAME" on your home machine.
@@ -72,16 +25,37 @@ ssh-keygen -t ed25519 -C "YOUR_NAME"
 ssh-keygen -t ed25519 -C "user"
 ```
 
-#### Add your SSH .pub to your VPS provider
+---
+
+### VPS
+
+##### Rent Virtual Private Server (VPS)
+
+We recommend using different hosting providers for diversification reasons.
+That said, some instances are using privacy-focused domain name registrar
+and hosting provider Njalla, established by one of The Pirate Bay founders.
+
+Configurations:
+
+- Ubuntu 22.04
+
+- You can choose as low as **1 core CPU** and **1 GB RAM**.
+
+##### Add your SSH .pub to your VPS provider
+
+Upload the SSH key generated above into the SSH form while setting up
+your server, so you can log into the server without a password.
 
 On Linux SSH .pub is usually located at `~/.ssh/YOUR_NAME.pub`
 
-Copy the content of `YOUR_NAME.pub` to clipboard with a text editor, e.g.:
+Manually copy the content of `YOUR_NAME.pub` to clipboard
+using a text editor, e.g.:
 
 ```shell
 nano ~/.ssh/user.pub
 ```
-Or via temrinal, e.g.:
+
+Or from the terminal, e.g.:
 
 ```shell
 cat ~/.ssh/user.pub
@@ -95,12 +69,17 @@ wl-copy < ~/.ssh/user.pub
 
 Open your VPS provider and paste your SSH pub key into an SSH form.
 
-If you're testing in VM, then paste into `/root/.ssh/authorized_keys`
+*Note: it's important to use SSH keys because the password authentication
+will be disabled by one of the following setup scripts.*
 
-Note: it's important to use SSH keys because the password authentication
-will be disabled by one of the following setup scripts.
+##### Testing in VM
 
-#### SSH into your server
+If you're testing the app locally in a virtual machine (VM),
+then paste your SSH key into `/root/.ssh/authorized_keys`
+
+##### SSH into your server
+
+Once your server is built by the VPS provider, you can try to log into it.
 
 ```shell
 # SSH into your server as root
@@ -133,7 +112,6 @@ Simply try to log in again with the same command.
 ssh -i ~/.ssh/user root@20.21.03.01
 ```
 
-
 Note: try to log in again if you got error 'Broken pipe'. 
 
 If you got another error, then read the troubleshooting section below.
@@ -146,7 +124,8 @@ If you got another error, then read the troubleshooting section below.
 
 Sometimes you can mess up the setup process, so it might be easier
 to rebuild your server and start the setup process from the scratch.
-However, you'll get an error when trying to SSH into a new server.
+However, you'll get an error when trying to SSH into a server that
+has been recently rebuilt.
 
 ```
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -169,18 +148,64 @@ because your server key fingerprint has changed after rebuild.
 ssh-keygen -R YOUR_SERVER_IP_ADDRESS
 # Example:
 ssh-keygen -R 20.21.03.01
-# Then try to SSH into your server without 'sudo':
+```
+
+Then try to SSH into your server without `sudo`:
+
+```shell
+# SSH into your server as root
 ssh -i ~/.ssh/YOUR_SSH_KEY root@YOUR_SERVER_IP_ADDRESS
 # Example:
 ssh -i ~/.ssh/user root@20.21.03.01
-
-# You should see the following message:
-# The authenticity of host 'YOUR_SERVER_IP_ADDRESS' can't be established.
-# Are you sure you want to continue connecting?
-# Type 'yes'.
-# You should be logged into your server.
-# Try to log in again if you got error 'Broken pipe'. 
 ```
+
+You should get the following message, type `yes` and press enter
+to add the server key fingerprint to your known hosts.
+
+```
+The authenticity of host 'YOUR_SERVER_IP_ADDRESS' can't be established.
+ED25519 key fingerprint is SHA256:YOUR_SERVER_FINGERPRINT.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+```
+
+---
+
+### DNS
+
+Configure DNS at the dashboard of your VPS provider.
+Add at least 3 records for this script to work without errors:
+
+```
+# your_domain.com
+# www.your_domain.com
+# staging.your_domain.com
+```
+
+Choose Type 'A' for IPv4 addresses.
+
+Choose Type 'AAAA' for IPv6 addresses.
+
+Set Name to your domain name.
+
+Set IPv4 to an IP address of your server.
+
+Choose TTL '3h' or leave it as default.
+
+```
+# Example:
+# Type:A, Name:degenrocket.space, IPv4:20.21.03.01, TTL:3h
+# Type:A, Name:www.degenrocket.space, IPv4:20.21.03.01, TTL:3h
+# Type:A, Name:staging.degenrocket.space, IPv4:20.21.03.01, TTL:3h
+```
+
+*Note: if you cannot set your domain name (e.g. 'degenrocket.space')
+as name, then try using '@' for root.*
+
+*Note: if you want to use 'AAAA' to link to an IPv6 address,
+then make sure that your firewall allows IPv6.*
+
+*For example, `IPV6=yes` in `/etc/default/ufw`*
 
 ---
 
@@ -248,7 +273,7 @@ You can change these paths in the `scripts/.env` file.
 ```
 root (manages initial server setup)
 ├── .ssh
-│   └── authorized_keys (for the first connect only)
+│   └── authorized_keys (for the first connection only)
 └── scripts (degenrocket-scripts.git)
     └── .env (this .env will be copied to user and admin)
 
@@ -284,12 +309,12 @@ Download all scripts manually into `/root/scripts/` or using `git clone`.
 
 ```shell
 # Create scripts folder
-mkdir scripts
+mkdir ~/scripts
 ```
 
 ```shell
 # Download all scripts from github into scripts folder
-git clone https://github.com/degenrocket/degenrocket-scripts.git scripts/
+git clone https://github.com/degenrocket/degenrocket-scripts.git ~/scripts/
 ```
 
 Look through all downloaded scripts and compare them to the source
@@ -297,13 +322,37 @@ to make sure that you didn't download anything malicious.
 
 ```shell
 # Example:
-nano scripts/initial-server-setup/01-root-setup-ssh-users-ufw-fail2ban.sh
+nano ~/scripts/initial-server-setup/01-root-setup-ssh-users-ufw-fail2ban.sh
+```
+
+#### Environment variables
+
+You can change environment variables to minimize interactions
+with automated scripts.
+
+Copy `.env.example` file into `.env`.
+
+```shell
+cp ~/scripts/.env.example ~/scripts/.env
+```
+
+Set your domain name and IP address of your server.
+
+```shell
+nano ~/scripts/.env
+```
+
+Example:
+
+```
+DOMAIN_NAME=degenrocket.space
+IP_ADDRESS=80.78.22.221
 ```
 
 #### Execute scripts 01, 02, 03 from `root`.
 
 ```shell
-bash scripts/initial-server-setup/01-root-setup-ssh-users-ufw-fail2ban.sh
+bash ~/scripts/initial-server-setup/01-root-setup-ssh-users-ufw-fail2ban.sh
 ```
 
 The script above will:
@@ -319,7 +368,7 @@ The script above will:
 * Install and enable fail2ban
 
 ```shell
-bash scripts/initial-server-setup/02-root-setup-apt-postgres-npm-nginx.sh
+bash ~/scripts/initial-server-setup/02-root-setup-apt-postgres-npm-nginx.sh
 ```
 
 The script above will:
@@ -331,7 +380,7 @@ The script above will:
 * Install and configure Nginx
 
 ```shell
-bash scripts/initial-server-setup/03-root-setup-psql-create-db.sh
+bash ~/scripts/initial-server-setup/03-root-setup-psql-create-db.sh
 ```
 
 The script above will:
@@ -362,7 +411,7 @@ simply testing the app via IP address on in the VM.*
 Note: this script requires sudo (default password: admin)
 
 ```shell
-sudo bash scripts/initial-server-setup/04-admin-setup-ssl.sh
+sudo bash ~/scripts/initial-server-setup/04-admin-setup-ssl.sh
 ```
 
 The script above will:
@@ -372,6 +421,29 @@ The script above will:
 * Request an SSL certificate (for HTTPS connection)
 * Test auto-renewal of a certificate
 
+Troubleshooting: sometimes you might get the following errors.
+
+```
+snapd.failure.service is a disabled or a static unit, not starting it
+snapd.mounts-pre.target is a disabled or a static unit, not starting it
+snapd.mounts.target is a disabled or a static unit, not starting it
+snapd.snap-repair.service is a disabled or a static unit, not starting it
+```
+
+In this case, simply press any key or `ctrl-c`
+and the process should continue.
+
+If the process doesn't continue, then exit the process,
+delete snapd, upgrade the system, and run the script again.
+
+```shell
+sudo apt purge snapd
+sudo dpkg --configure -a
+sudo apt update
+sudo apt upgrade
+sudo apt dist-upgrade
+sudo bash ~/scripts/initial-server-setup/04-admin-setup-ssl.sh
+```
 
 ---
 
@@ -389,7 +461,7 @@ There should already be a folder with scripts.
 If not, copy-paste the script manually or use `git clone`, and then execute:
 
 ```shell
-bash scripts/initial-server-setup/05-user-setup-pm2.sh
+bash ~/scripts/initial-server-setup/05-user-setup-pm2.sh
 ```
 
 The script above will:
@@ -399,13 +471,15 @@ The script above will:
 Next, we can finally instal the app.
 
 ```shell
-bash scripts/initial-server-setup/06-user-setup-git.sh
+bash ~/scripts/initial-server-setup/06-user-setup-git.sh
 ```
 
 The following script will:
 * Create folders to download the app
 * Download the app with git
 * Install dependencies
+
+*Note: you can choose 'No' when Nuxt asks you to collect data.*
 
 ---
 
