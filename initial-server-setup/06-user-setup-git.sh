@@ -108,13 +108,13 @@ read -p "${SSL_PROMPT_TEXT}" IF_SSL
 echo "SSL certificate: \"${IF_SSL}\""
 
 if [[ "${IF_SSL}" =~ ^(yes|y|Yes|YES)$ ]]; then
-    echo "User has SSL certificate, changing frontend/.env 'http' to 'https'"
-    # Change all occurrences of http to https
-    sed -i "s/http/https/g" ${FRONTEND_FOLDER}/.env
+    echo "User has SSL certificate, changing frontend/.env 'http:' to 'https:'"
+    # Change all occurrences of API_URL=http: to API_URL=https:
+    sed -i "s/API_URL=http:/API_URL=https:/g" ${FRONTEND_FOLDER}/.env
 else
     echo "No SSL certificate, changing frontend/.env 'https' to 'http'"
     # Change all occurrences of https to http
-    sed -i "s/https/http/g" ${FRONTEND_FOLDER}/.env
+    sed -i "s/API_URL=https:/API_URL=http:/g" ${FRONTEND_FOLDER}/.env
 fi
 
 echo "-----------------"
