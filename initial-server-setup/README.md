@@ -658,11 +658,71 @@ you'll need to rebuild the server and start the setup process again.*
 # SSH into the server as a user
 # Switch to an admin (default password: admin)
 su - admin
+```
 
-# Change passwords for a user and admin
+##### 1. Change a defalt password for user.
+
+```shell
 sudo passwd user
+```
+
+##### 2. Change a defalt password for admin.
+
+```shell
 sudo passwd admin
 ```
+
+##### 3. Change a defalt password for a database user.
+
+Connect to the database from user or admin.
+
+*Note: change `news_database`, `dbuser`, `5432` if you've used
+custom values for `POSTGRES_DATABASE`, `POSTGRES_USER`, `POSTGRES_PORT`.*
+
+```shell
+psql -h localhost -d news_database -U dbuser -p 5432
+```
+
+Change a password of a database user and exit the database.
+
+*Note: type your password instead of 'new_password'.*
+
+```shell
+ALTER USER dbuser WITH PASSWORD 'new_password';
+exit
+```
+
+Change a default password in the backend `.env` file
+to the same password as in the step above.
+
+- Open the environment file.
+
+```shell
+vim ~/apps/degenrocket/backend/.env
+```
+
+- Change a value of the `POSTGRES_PASSWORD` variable, example:
+
+```shell
+POSTGRES_PASSWORD=new_password
+```
+
+*Note: use "" if your password has spaces, e.g.:*
+
+```shell
+POSTGRES_PASSWORD="my new password"
+```
+
+- Restart the backend pm2 instance
+
+```shell
+pm2 list
+pm2 delete dr-prod-back
+npm run --prefix ~/apps/degenrocket/backend prod
+pm2 save
+```
+
+- Test the app in the browser.
 
 ---
 
