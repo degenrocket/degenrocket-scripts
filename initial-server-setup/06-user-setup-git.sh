@@ -144,5 +144,5 @@ update_env_var POSTGRES_PASSWORD ${BACKEND_FOLDER}
 echo "Installation is done."
 echo "Before building the frontend, adjust customization options in:"
 echo "${FRONTEND_FOLDER}/.env"
-echo "Also check backend environment variables:"
+echo "Before building the backend, adjust customization options in:"
 echo "${BACKEND_FOLDER}/.env"

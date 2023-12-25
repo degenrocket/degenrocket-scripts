@@ -115,8 +115,8 @@ delete_pm2_instance "prod-front@1.3.0"
 delete_pm2_instance "prod-front@1.2.0"
 delete_pm2_instance "prod-front@1.1.0"
 
-npm run --prefix "${BACKEND_DIR}" prod
-npm run --prefix "${FRONTEND_DIR}" prod
+npm run --prefix "${BACKEND_DIR}" start-prod
+npm run --prefix "${FRONTEND_DIR}" start-prod
 
 pm2 save
 
