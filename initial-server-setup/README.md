@@ -609,18 +609,27 @@ SSH into a server as a user or switch to a user
 su - user
 ```
  
+Build and start the backend
+
 ```shell
-# Start the backend
-cd ~/apps/degenrocket/backend && npm run prod && cd ~/
-# Build and then start the frontend
-cd ~/apps/degenrocket/frontend && npm run build && npm run prod && cd ~/
+npm run --prefix ~/apps/degenrocket/backend prod
 ```
 
-```shell
-# Check running apps
-pm2 list
+Build and start the frontend
 
-# Save running apps so they auto-start after each system reboot
+```shell
+npm run --prefix ~/apps/degenrocket/frontend prod
+```
+
+Check running apps
+
+```shell
+pm2 list
+```
+
+Save running apps so they auto-start after each system reboot
+
+```shell
 pm2 save
 ```
 
