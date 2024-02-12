@@ -5,7 +5,7 @@
 Enable communication with Nostr relays to fetch metadata
 (usernames, about, website, picture) and preferred relays.
 
-New environment variables:
+New frontend environment variables:
 
 ```
 ENABLE_NOSTR_NETWORK

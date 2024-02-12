@@ -4,7 +4,7 @@
 
 Enable instance interoperability with the SPASM module.
 
-New environment variables:
+New backend environment variables:
 
 ```
 ENABLE_INTEROPERABILITY_MODULE
