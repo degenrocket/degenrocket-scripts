@@ -2,6 +2,12 @@
 
 This repository contains scripts and guides to automate the initial server setup and simplify the management of a DegenRocket server.
 
+Download all scripts from github into scripts folder:
+
+```shell
+git clone https://github.com/degenrocket/degenrocket-scripts.git ~/scripts/
+```
+
 #### Initial server setup
 
 If you don't know how to set up the server, then check a beginner guide in the `initial-server-setup` folder.

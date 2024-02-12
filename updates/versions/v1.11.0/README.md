@@ -22,13 +22,21 @@ RSS_FREQUENCY_LOW_TIME_INTERVAL="58m"
 RSS feed sources should be located at:
 
 ```
+# v1.11.0
 backend/helper/rss/custom/customFeedSources.js
+
+# v1.12.0+
+backend/helper/rss/custom/customFeedSources.ts
 ```
 
 An example file can be found at:
 
 ```
+# v1.11.0
 backend/helper/rss/custom/customFeedSources.example.js
+
+# v1.12.0+
+backend/helper/rss/custom/customFeedSources.example.ts
 ```
 
 ---

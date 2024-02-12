@@ -20,13 +20,21 @@ If you followed the guide for initial server setup, then you can execute the upd
 Download new scripts
 
 ```shell
-cd ~/scripts && git reset --hard HEAD && git pull
+cd ~/scripts && git reset --hard HEAD && git pull && cd ~/
 ```
 
 Check the script to make sure that you didn't download anything malicious.
 
 ```shell
 cat ~/scripts/updates/user-update-to-latest-version.sh | less
+```
+
+**Note: press `q` keyboard to quit `less`**
+
+(Optional) Backup the database.
+
+```shell
+bash ~/scripts/database/user-database-backup.sh
 ```
 
 Execute the update script
