@@ -775,6 +775,34 @@ You can also open an SFTP connection to upload/download files:
 sftp my-server
 ```
 
+---
+
+### Troubleshooting
+
+#### Cors
+
+The backend API should work even if your frontend and backend
+have different IP addresses. However, if you still get cors
+errors, consider enabling cors for all origins in the Nginx
+config to see if the issue will be mitigated, e.g.:
+
+```
+location / {
+    if ($request_method = 'GET') {
+        add_header 'Access-Control-Allow-Origin' '*' always;
+    }
+}
+
+location /api {
+    if ($request_method = 'GET') {
+        add_header 'Access-Control-Allow-Origin' '*' always;
+    }
+}
+```
+
+
+---
+
 ### Contacts
 
 [Session](https://getsession.org): `degenrocket`
