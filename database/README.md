@@ -1,6 +1,20 @@
 ### Database backup
 
-#### Database backup as a user
+#### Database backup without a script
+
+```
+pg_dump -h localhost -U DATABASE_USER DATABASE_NAME > FULL_PATH_TO_BACKUP -p DATABASE_PORT
+```
+
+You will be prompted to enter a password for the database user.
+
+Example:
+
+```
+pg_dump -h localhost -U dbuser news_database > ~/apps/backups/database/news_database_20230101.sql -p 5432
+```
+
+#### Database backup with a script as a user
 
 You can execute `user-database-backup.sh` as `user` to create a backup of a database into the `user` home directory so you can download it using `sftp`.
 
@@ -20,7 +34,7 @@ By default a backup is created at:
 
 *Note: you can change default paths in `~/scripts/.env`.*
 
-#### Database backup as an admin
+#### Database backup with a script as an admin
 
 You can execute `admin-database-backup.sh` as `admin` to create a backup of a database into the `admin` home directory and copy the backup to the `user` home directory so you can download it using `sftp`.
 
