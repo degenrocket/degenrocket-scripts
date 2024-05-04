@@ -54,7 +54,7 @@ su - postgres bash -c "psql -c \"CREATE USER ${POSTGRES_USER} WITH PASSWORD '${P
 su - postgres bash -c "psql -c \"CREATE DATABASE ${POSTGRES_DATABASE} WITH OWNER = ${POSTGRES_USER};\""
 
 # Create tables
-CREATE_TABLES_SQL="CREATE TABLE IF NOT EXISTS posts(
+CREATE_TABLES_SQL="CREATE TABLE posts(
 id SERIAL NOT NULL,
 guid TEXT NOT NULL PRIMARY KEY,
 source TEXT,
@@ -65,7 +65,7 @@ url TEXT,
 description TEXT,
 pubdate TIMESTAMPTZ
 );
-CREATE TABLE IF NOT EXISTS actions(
+CREATE TABLE actions(
 id SERIAL NOT NULL,
 target TEXT NOT NULL,
 action TEXT,
@@ -78,7 +78,7 @@ signature TEXT,
 signed_time TIMESTAMPTZ,
 added_time TIMESTAMPTZ
 );
-CREATE TABLE IF NOT EXISTS public.actions_count(
+CREATE TABLE public.actions_count(
 target text NOT NULL,
 upvote integer,
 downvote integer,
@@ -89,6 +89,9 @@ scam integer,
 comments_count integer,
 latest_action_added_time TIMESTAMPTZ,
 PRIMARY KEY (target)
+);
+CREATE TABLE spasm_events (
+event JSONB
 );"
 
 # The PGPASSWORD environment variable is used by
