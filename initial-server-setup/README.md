@@ -386,7 +386,7 @@ bash ~/scripts/initial-server-setup/03-root-setup-psql-create-db.sh
 The script above will:
 * Create a new postgres user (default: dbuser)
 * Set a password for a new user (default: dbuser)
-* Create a new database (default: news_database) owned by a new user 
+* Create a new database (default: spasm_database) owned by a new user 
 * Create required database tables
 
 ---
@@ -685,11 +685,11 @@ sudo passwd admin
 
 Connect to the database from user or admin.
 
-*Note: change `news_database`, `dbuser`, `5432` if you've used
+*Note: change `spasm_database`, `dbuser`, `5432` if you've used
 custom values for `POSTGRES_DATABASE`, `POSTGRES_USER`, `POSTGRES_PORT`.*
 
 ```shell
-psql -h localhost -d news_database -U dbuser -p 5432
+psql -h localhost -d spasm_database -U dbuser -p 5432
 ```
 
 Change a password of a database user and exit the database.

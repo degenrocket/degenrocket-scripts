@@ -11,7 +11,7 @@ You will be prompted to enter a password for the database user.
 Example:
 
 ```
-pg_dump -h localhost -U dbuser news_database > ~/apps/backups/database/news_database_20230101.sql -p 5432
+pg_dump -h localhost -U dbuser spasm_database > ~/apps/backups/database/spasm_database_20230101.sql -p 5432
 ```
 
 #### Database backup with a script as a user
@@ -29,7 +29,7 @@ bash ~/scripts/database/user-database-backup.sh
 By default a backup is created at:
 
 ```
-/home/user/apps/backups/database/news_database_CURRENT_DATE.sql
+/home/user/apps/backups/database/spasm_database_CURRENT_DATE.sql
 ```
 
 *Note: you can change default paths in `~/scripts/.env`.*
@@ -49,8 +49,8 @@ bash ~/scripts/database/admin-database-backup.sh
 By default backups are created at:
 
 ```
-/home/user/backups/database/news_database_CURRENT_DATE.sql
-/home/admin/backups/database/news_database_CURRENT_DATE.sql
+/home/user/backups/database/spasm_database_CURRENT_DATE.sql
+/home/admin/backups/database/spasm_database_CURRENT_DATE.sql
 ```
 
 *Note: you can change default paths in `~/scripts/.env`.*
@@ -65,10 +65,10 @@ If you want to restore the database from the backup,
 execute the following command from a user or an admin:
 
 ```
-psql -h localhost -U dbuser news_database < news_database_20230101.sql
+psql -h localhost -U dbuser spasm_database < spasm_database_20230101.sql
 ```
 
-*Note: change `news_database_20230101` to the name of your database backup file, and don't forget to change default db name `news_database`, db username `dbuser`, and db port `5432` if you've used custom values.*
+*Note: change `spasm_database_20230101` to the name of your database backup file, and don't forget to change default db name `spasm_database`, db username `dbuser`, and db port `5432` if you've used custom values.*
 
 ### TIPS
 
@@ -76,10 +76,10 @@ psql -h localhost -U dbuser news_database < news_database_20230101.sql
 
 Connect to the database
 
-*Note: don't forget to change default db name `news_database`, db username `dbuser`, and db port `5432` if you've used custom values.*
+*Note: don't forget to change default db name `spasm_database`, db username `dbuser`, and db port `5432` if you've used custom values.*
 
 ```
-psql -h localhost -d news_database -U dbuser -p 5432
+psql -h localhost -d spasm_database -U dbuser -p 5432
 ```
 
 Delete the post via signature

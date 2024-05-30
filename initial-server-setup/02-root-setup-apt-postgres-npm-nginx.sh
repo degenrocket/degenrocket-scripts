@@ -57,7 +57,7 @@ echo "host    all             all             ::/0                            md
 systemctl restart postgresql
 
 # You can test postgresql connection for user 'dbuser' with:
-# psql -h localhost -d news_database -U dbuser -p 5432
+# psql -h localhost -d spasm_database -U dbuser -p 5432
 
 ################################
 # Download NVM install script

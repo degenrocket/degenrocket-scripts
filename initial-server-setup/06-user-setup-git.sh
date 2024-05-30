@@ -24,7 +24,7 @@ ADMIN="${ADMIN_NAME:-admin}"
 APP_NAME="${APP_NAME:-degenrocket}"
 ALL_APPS_FOLDER="${ALL_APPS_FOLDER:-apps}"
 POSTGRES_USER="${POSTGRES_USER:-dbuser}"
-POSTGRES_DATABASE="${POSTGRES_DATABASE:-news_database}"
+POSTGRES_DATABASE="${POSTGRES_DATABASE:-spasm_database}"
 POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 
 # Temporary set a password to be equal to a database username,

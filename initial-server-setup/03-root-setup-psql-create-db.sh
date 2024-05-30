@@ -29,7 +29,7 @@ test -f "${ENV_FILE}" && source "${ENV_FILE}"
 USER="${USER_NAME:-user}"
 ADMIN="${ADMIN_NAME:-admin}"
 POSTGRES_USER="${POSTGRES_USER:-dbuser}"
-POSTGRES_DATABASE="${POSTGRES_DATABASE:-news_database}"
+POSTGRES_DATABASE="${POSTGRES_DATABASE:-spasm_database}"
 POSTGRES_PORT="${POSTGRES_PORT:-5432}"
 
 # Temporary set a password to be equal to a database username,
@@ -60,6 +60,7 @@ guid TEXT NOT NULL PRIMARY KEY,
 source TEXT,
 category TEXT,
 tickers TEXT,
+tags TEXT,
 title TEXT,
 url TEXT,
 description TEXT,
@@ -70,6 +71,8 @@ id SERIAL NOT NULL,
 target TEXT NOT NULL,
 action TEXT,
 category TEXT,
+tags TEXT,
+tickers TEXT,
 title TEXT,
 text TEXT,
 signer TEXT,
@@ -91,19 +94,34 @@ latest_action_added_time TIMESTAMPTZ,
 PRIMARY KEY (target)
 );
 CREATE TABLE spasm_events (
-spasm_event JSONB
+spasm_event JSONB,
+db_key SERIAL PRIMARY KEY NOT NULL,
+db_added_timestamp BIGINT,
+db_updated_timestamp BIGINT
 );
-CREATE TABLE users (
-user JSONB
-);
-CREATE TABLE rss_sources (
-rss_source JSONB
+CREATE TABLE spasm_users (
+spasm_user JSONB,
+db_key SERIAL PRIMARY KEY NOT NULL,
+db_added_timestamp BIGINT,
+db_updated_timestamp BIGINT
 );
 CREATE TABLE spasm_sources (
-spasm_source JSONB
+spasm_source JSONB,
+db_key SERIAL PRIMARY KEY NOT NULL,
+db_added_timestamp BIGINT,
+db_updated_timestamp BIGINT
+);
+CREATE TABLE rss_sources (
+rss_source JSONB,
+db_key SERIAL PRIMARY KEY NOT NULL,
+db_added_timestamp BIGINT,
+db_updated_timestamp BIGINT
 );
 CREATE TABLE extra_items (
-extra_item JSONB
+extra_item JSONB,
+db_key SERIAL PRIMARY KEY NOT NULL,
+db_added_timestamp BIGINT,
+db_updated_timestamp BIGINT
 );"
 
 # The PGPASSWORD environment variable is used by
@@ -121,7 +139,7 @@ extra_item JSONB
 su - postgres bash -c "env PGPASSWORD=\"${POSTGRES_PASSWORD}\" psql -h localhost -d ${POSTGRES_DATABASE} -U ${POSTGRES_USER} -p ${POSTGRES_PORT} -c \"$CREATE_TABLES_SQL\""
 
 # You can test postgresql connection for user 'dbuser' with:
-# psql -h localhost -d news_database -U dbuser -p 5432
+# psql -h localhost -d spasm_database -U dbuser -p 5432
 # Then list all tables:
 # \dt
 # Check query:
