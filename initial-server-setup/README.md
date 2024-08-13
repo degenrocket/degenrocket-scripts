@@ -384,7 +384,8 @@ bash ~/scripts/initial-server-setup/03-root-setup-psql-create-db.sh
 ```
 
 The script above will:
-* Create a new postgres user (default: dbuser)
+* Create a new postgres user without superuser privileges (default: dbuser)
+* Grant that user a privilege to create new databases (used by some npm scripts)
 * Set a password for a new user (default: dbuser)
 * Create a new database (default: spasm_database) owned by a new user 
 * Create required database tables
