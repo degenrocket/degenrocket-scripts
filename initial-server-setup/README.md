@@ -112,7 +112,7 @@ Simply try to log in again with the same command.
 ssh -i ~/.ssh/user root@20.21.03.01
 ```
 
-Note: try to log in again if you got error 'Broken pipe'. 
+*Note: try to log in again if you got error 'Broken pipe'.*
 
 If you got another error, then read the troubleshooting section below.
 
@@ -305,6 +305,12 @@ home
 
 You should be logged in as `root`, so you can run setup scripts.
 
+Install git.
+
+```shell
+apt-get install git
+```
+
 Download all scripts manually into `/root/scripts/` or using `git clone`.
 
 ```shell
@@ -366,6 +372,21 @@ The script above will:
 * Disable SSH password authentication
 * Configure UFW firewall to allow SSH, ftp, http, https
 * Install and enable fail2ban
+
+After running the script above your should be able to log into
+your server as a user with a custom port. You can test that in
+another terminal before running the next script.
+
+Example:
+
+```shell
+ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
+```
+
+*Note: username and port might be different if you've changed
+them in the .env file.*
+
+Next script.
 
 ```shell
 bash ~/scripts/initial-server-setup/02-root-setup-apt-postgres-npm-nginx.sh

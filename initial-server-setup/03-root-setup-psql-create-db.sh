@@ -8,7 +8,7 @@ set -euo pipefail
 # $nrconf{restart} = 'a';
 # to 'l' is we want to simply list the services that need restart.
 # $nrconf{restart} = 'l';
-sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
+# sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
 # Another approach to stop prompts (currently disabled): 
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
@@ -53,6 +53,31 @@ echo "Starting the script..."
 # new databases, which will be used by other scripts.
 su - postgres bash -c "psql -c \"CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}'; ALTER USER ${POSTGRES_USER} CREATEDB;\""
 
+# su - postgres bash -c "psql -c \"
+# IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '''${POSTGRES_USER}''') THEN
+# CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}'; ALTER USER ${POSTGRES_USER} CREATEDB;
+# \""
+
+# su - postgres bash -c "psql -c \"BEGIN; IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '''${POSTGRES_USER}''') THEN CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}'; ALTER USER ${POSTGRES_USER} CREATEDB; END IF; \""
+
+# Create SQL script content
+# SQL_SCRIPT=$(cat <<EOF
+# BEGIN;
+# DECLARE
+#     user_exists boolean;
+# BEGIN
+#     SELECT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '''${POSTGRES_USER}''') INTO user_exists;
+#
+#     IF NOT user_exists THEN
+#         CREATE USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';
+#         ALTER USER ${POSTGRES_USER} CREATEDB;
+#     END IF;
+# COMMIT;
+# EOF
+# )
+
+# su - postgres bash -c "psql -c '${SQL_SCRIPT}'"
+
 # Create database
 su - postgres bash -c "psql -c \"CREATE DATABASE ${POSTGRES_DATABASE} WITH OWNER = ${POSTGRES_USER};\""
 
@@ -60,191 +85,99 @@ su - postgres bash -c "psql -c \"CREATE DATABASE ${POSTGRES_DATABASE} WITH OWNER
 su - postgres bash -c "psql -c \"CREATE DATABASE ${POSTGRES_DATABASE_TEST} WITH OWNER = ${POSTGRES_USER};\""
 
 # Create tables
-CREATE_TABLES_SQL="DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'posts'
-    ) THEN
-        CREATE TABLE posts (
-            id SERIAL NOT NULL,
-            guid TEXT NOT NULL PRIMARY KEY,
-            source TEXT,
-            category TEXT,
-            tickers TEXT,
-            tags TEXT,
-            title TEXT,
-            url TEXT,
-            description TEXT,
-            pubdate TIMESTAMPTZ
-        );
-    END IF;
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'actions'
-    ) THEN
-        CREATE TABLE actions (
-            id SERIAL NOT NULL,
-            target TEXT NOT NULL,
-            action TEXT,
-            category TEXT,
-            tags TEXT,
-            tickers TEXT,
-            title TEXT,
-            text TEXT,
-            signer TEXT,
-            signed_message TEXT,
-            signature TEXT,
-            signed_time TIMESTAMPTZ,
-            added_time TIMESTAMPTZ
-        );
-    END IF;
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'actions_count'
-    ) THEN
-        CREATE TABLE actions_count (
-            target text NOT NULL,
-            upvote integer,
-            downvote integer,
-            bullish integer,
-            bearish integer,
-            important integer,
-            scam integer,
-            comments_count integer,
-            latest_action_added_time TIMESTAMPTZ,
-            PRIMARY KEY (target)
-        );
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'spasm_events'
-    ) THEN
-        CREATE TABLE spasm_events (
-            spasm_event JSONB,
-            stats JSONB,
-            shared_by JSONB,
-            db_key SERIAL PRIMARY KEY NOT NULL,
-            db_added_timestamp BIGINT,
-            db_updated_timestamp BIGINT
-        );
-    END IF;
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'spasm_users'
-    ) THEN
-        CREATE TABLE spasm_users (
-            spasm_user JSONB,
-            db_key SERIAL PRIMARY KEY NOT NULL,
-            db_added_timestamp BIGINT,
-            db_updated_timestamp BIGINT
-        );
-    END IF;
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'spasm_sources'
-    ) THEN
-        CREATE TABLE spasm_sources (
-            spasm_source JSONB,
-            db_key SERIAL PRIMARY KEY NOT NULL,
-            db_added_timestamp BIGINT,
-            db_updated_timestamp BIGINT
-        );
-    END IF;
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'rss_sources'
-    ) THEN
-        CREATE TABLE rss_sources (
-            rss_source JSONB,
-            db_key SERIAL PRIMARY KEY NOT NULL,
-            db_added_timestamp BIGINT,
-            db_updated_timestamp BIGINT
-        );
-    END IF;
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'extra_items'
-    ) THEN
-        CREATE TABLE extra_items (
-            extra_item JSONB,
-            db_key SERIAL PRIMARY KEY NOT NULL,
-            db_added_timestamp BIGINT,
-            db_updated_timestamp BIGINT
-        );
-    END IF;
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'admin_events'
-    ) THEN
-        CREATE TABLE admin_events (
-            spasm_event JSONB,
-            db_key SERIAL PRIMARY KEY NOT NULL,
-            db_added_timestamp BIGINT,
-            db_updated_timestamp BIGINT
-        );
-    END IF;
-    IF NOT EXISTS (
-        SELECT FROM information_schema.tables 
-        WHERE table_schema = 'public' AND table_name = 'app_configs'
-    ) THEN
-        CREATE TABLE app_configs (
-            spasm_event JSONB,
-            db_key SERIAL PRIMARY KEY NOT NULL,
-            db_added_timestamp BIGINT,
-            db_updated_timestamp BIGINT
-        );
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes WHERE indexname = 'spasm_events_event_idx'
-    ) THEN
-        EXECUTE 'CREATE INDEX spasm_events_event_idx ON spasm_events USING GIN (spasm_event)';
-    END IF;
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes WHERE indexname = 'spasm_events_stats_idx'
-    ) THEN
-        EXECUTE 'CREATE INDEX spasm_events_stats_idx ON spasm_events USING GIN (stats)';
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes WHERE indexname = 'spasm_users_user_idx'
-    ) THEN
-        EXECUTE 'CREATE INDEX spasm_users_user_idx ON spasm_users USING GIN (spasm_user)';
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes WHERE indexname = 'spasm_sources_source_idx'
-    ) THEN
-        EXECUTE 'CREATE INDEX spasm_sources_source_idx ON spasm_sources USING GIN (spasm_source)';
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes WHERE indexname = 'rss_sources_source_idx'
-    ) THEN
-        EXECUTE 'CREATE INDEX rss_sources_source_idx ON rss_sources USING GIN (rss_source)';
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes WHERE indexname = 'extra_items_item_idx'
-    ) THEN
-        EXECUTE 'CREATE INDEX extra_items_item_idx ON extra_items USING GIN (extra_item)';
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes WHERE indexname = 'admin_events_event_idx'
-    ) THEN
-        EXECUTE 'CREATE INDEX admin_events_event_idx ON admin_events USING GIN (spasm_event)';
-    END IF;
-
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes WHERE indexname = 'app_configs_event_idx'
-    ) THEN
-        EXECUTE 'CREATE INDEX app_configs_event_idx ON app_configs USING GIN (spasm_event)';
-    END IF;
-
-END $$;"
+CREATE_TABLES_SQL="
+CREATE TABLE posts (
+    id SERIAL NOT NULL,
+    guid TEXT NOT NULL PRIMARY KEY,
+    source TEXT,
+    category TEXT,
+    tickers TEXT,
+    tags TEXT,
+    title TEXT,
+    url TEXT,
+    description TEXT,
+    pubdate TIMESTAMPTZ
+);
+CREATE TABLE actions (
+    id SERIAL NOT NULL,
+    target TEXT NOT NULL,
+    action TEXT,
+    category TEXT,
+    tags TEXT,
+    tickers TEXT,
+    title TEXT,
+    text TEXT,
+    signer TEXT,
+    signed_message TEXT,
+    signature TEXT,
+    signed_time TIMESTAMPTZ,
+    added_time TIMESTAMPTZ
+);
+CREATE TABLE actions_count (
+    target text NOT NULL,
+    upvote integer,
+    downvote integer,
+    bullish integer,
+    bearish integer,
+    important integer,
+    scam integer,
+    comments_count integer,
+    latest_action_added_time TIMESTAMPTZ,
+    PRIMARY KEY (target)
+);
+CREATE TABLE spasm_events (
+    spasm_event JSONB,
+    stats JSONB,
+    shared_by JSONB,
+    db_key SERIAL PRIMARY KEY NOT NULL,
+    db_added_timestamp BIGINT,
+    db_updated_timestamp BIGINT
+);
+CREATE TABLE spasm_users (
+    spasm_user JSONB,
+    db_key SERIAL PRIMARY KEY NOT NULL,
+    db_added_timestamp BIGINT,
+    db_updated_timestamp BIGINT
+);
+CREATE TABLE spasm_sources (
+    spasm_source JSONB,
+    db_key SERIAL PRIMARY KEY NOT NULL,
+    db_added_timestamp BIGINT,
+    db_updated_timestamp BIGINT
+);
+CREATE TABLE rss_sources (
+    rss_source JSONB,
+    db_key SERIAL PRIMARY KEY NOT NULL,
+    db_added_timestamp BIGINT,
+    db_updated_timestamp BIGINT
+);
+CREATE TABLE extra_items (
+    extra_item JSONB,
+    db_key SERIAL PRIMARY KEY NOT NULL,
+    db_added_timestamp BIGINT,
+    db_updated_timestamp BIGINT
+);
+CREATE TABLE admin_events (
+    spasm_event JSONB,
+    db_key SERIAL PRIMARY KEY NOT NULL,
+    db_added_timestamp BIGINT,
+    db_updated_timestamp BIGINT
+);
+CREATE TABLE app_configs (
+    spasm_event JSONB,
+    db_key SERIAL PRIMARY KEY NOT NULL,
+    db_added_timestamp BIGINT,
+    db_updated_timestamp BIGINT
+);
+CREATE INDEX spasm_events_event_idx ON spasm_events USING GIN (spasm_event);
+CREATE INDEX spasm_events_stats_idx ON spasm_events USING GIN (stats);
+CREATE INDEX spasm_users_user_idx ON spasm_users USING GIN (spasm_user);
+CREATE INDEX spasm_sources_source_idx ON spasm_sources USING GIN (spasm_source);
+CREATE INDEX rss_sources_source_idx ON rss_sources USING GIN (rss_source);
+CREATE INDEX extra_items_item_idx ON extra_items USING GIN (extra_item);
+CREATE INDEX admin_events_event_idx ON admin_events USING GIN (spasm_event);
+CREATE INDEX app_configs_event_idx ON app_configs USING GIN (spasm_event);
+"
 
 # The PGPASSWORD environment variable is used by
 # the psql command to authenticate the user.

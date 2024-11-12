@@ -8,7 +8,7 @@ set -euo pipefail
 # $nrconf{restart} = 'a';
 # 'l' if we want to simply list the services that need restart.
 # $nrconf{restart} = 'l';
-sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
+# sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
 # Another approach to stop prompts (currently disabled): 
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
@@ -221,6 +221,7 @@ fi
 
 ################################
 ########### FIREWALL ###########
+apt-get -y install ufw
 # Configure firewall
 sudo ufw allow ${NEW_SSH_PORT}/tcp comment 'SSH'
 sudo ufw allow ssh comment 'ssh'

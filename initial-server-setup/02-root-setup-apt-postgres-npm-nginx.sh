@@ -8,7 +8,7 @@ set -euo pipefail
 # $nrconf{restart} = 'a';
 # to 'l' is we want to simply list the services that need restart.
 # $nrconf{restart} = 'l';
-sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
+# sed -i "/#\$nrconf{restart} = 'i';/s/.*/\$nrconf{restart} = 'a';/" /etc/needrestart/needrestart.conf
 # Another approach to stop prompts (currently disabled): 
 export NEEDRESTART_MODE=a
 export DEBIAN_FRONTEND=noninteractive
@@ -61,6 +61,8 @@ systemctl restart postgresql
 
 ################################
 # Download NVM install script
+apt-get -y install curl
+
 su - "${USER}" bash -c "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash"
 
 # Install NVM

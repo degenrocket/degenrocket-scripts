@@ -172,6 +172,10 @@ else
   echo "- Exit this script."
   echo "- Investigate and fix the issue."
   echo "- Run this script again."
+  echo "You can try to ping your website from another terminal:"
+  echo "host '${SITE_TLD}'"
+  echo "If the command above returns a valid IP address,"
+  echo "then you can continue this script."
 
   CANNOT_RESOLVE_PROMPT_TEXT="
 Proceed further even though the domain name cannot be resolved?
