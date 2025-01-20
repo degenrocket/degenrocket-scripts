@@ -8,7 +8,7 @@ You don't have to follow this guide if you're an experienced sysadmin or you alr
 
 The large portion of the setup is done via custom scripts, so you mostly need to copy-paste commands into a terminal and wait for the installation process to finish with minimum interactions like typing your domain name.
 
-This instruction has been tested on **Ubuntu 22.04.3**.
+This instruction has been tested on **Ubuntu 22.04.5**.
 
 Troubleshooting: if you encounter any errors, please create a new issue or send a message to `degenrocket` on [Session](https://getsession.org).
 
