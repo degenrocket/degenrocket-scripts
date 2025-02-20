@@ -216,6 +216,9 @@ ln -sf /snap/bin/certbot /usr/bin/certbot
 # certbot --nginx
 # certbot --nginx -d yourdomain.com -d www.yourdomain.com
 # certbot certonly --noninteractive --agree-tos --cert-name slickstack -d ${SITE_TLD} -d www.${SITE_TLD} -d staging.${SITE_TLD} -d dev.${SITE_TLD} --register-unsafely-without-email --webroot -w /var/www/html/
+# with docs.
+# certbot --noninteractive --agree-tos --nginx --cert-name ${SITE_TLD} -d ${SITE_TLD} -d www.${SITE_TLD} -d staging.${SITE_TLD} -d docs.${SITE_TLD} --register-unsafely-without-email
+# without docs.
 certbot --noninteractive --agree-tos --nginx --cert-name ${SITE_TLD} -d ${SITE_TLD} -d www.${SITE_TLD} -d staging.${SITE_TLD} --register-unsafely-without-email
 
 # Test auto-renewal

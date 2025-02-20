@@ -196,7 +196,8 @@ echo "SSH password authentication disabled"
 # so it doesn't include "PasswordAuthentication yes"
 echo "" > /etc/ssh/sshd_config.d/50-cloud-init.conf
 
-service sshd restart
+# service sshd restart
+systemctl restart ssh
 echo "SSH is configured"
 echo "--------"
 

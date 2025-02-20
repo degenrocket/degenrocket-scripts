@@ -235,7 +235,7 @@ of the server and cannot log in as a root to continue,
 then try to log in as a `user` with port `2222`, e.g.:
 
 ```shell
-ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
+ssh -i ~/.ssh/user user@20.21.03.01 -P 2222
 # Don't forget to change 20.21.03.01 to your server IP address
 
 # then switch to an admin (default password: admin)
@@ -380,7 +380,7 @@ another terminal before running the next script.
 Example:
 
 ```shell
-ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
+ssh -i ~/.ssh/user user@20.21.03.01 -P 2222
 ```
 
 *Note: username and port might be different if you've changed
@@ -772,7 +772,7 @@ Example:
 
 ```shell
 # Don't forget to change '20.21.03.01' to your server IP address
-ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
+ssh -i ~/.ssh/user user@20.21.03.01 -P 2222
 ```
 
 You can also add this to `~/.ssh/config` on your home machine:
