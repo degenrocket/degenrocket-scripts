@@ -8,7 +8,7 @@ You don't have to follow this guide if you're an experienced sysadmin or you alr
 
 The large portion of the setup is done via custom scripts, so you mostly need to copy-paste commands into a terminal and wait for the installation process to finish with minimum interactions like typing your domain name.
 
-This instruction has been tested on **Ubuntu 22.04.5**.
+This instruction has been tested on **Ubuntu 24.04.2**.
 
 Troubleshooting: if you encounter any errors, please create a new issue or send a message to `degenrocket` on [Session](https://getsession.org).
 
@@ -37,7 +37,7 @@ and hosting provider Njalla, established by one of The Pirate Bay founders.
 
 Configurations:
 
-- Ubuntu 22.04
+- Ubuntu 24.04
 
 - You can choose as low as **1 core CPU** and **1 GB RAM**.
 
@@ -206,6 +206,14 @@ as name, then try using '@' for root.*
 then make sure that your firewall allows IPv6.*
 
 *For example, `IPV6=yes` in `/etc/default/ufw`*
+
+*Note: if you want to run an instance on a subdomain like 'forum',
+then you should only add one record for that subdomain.*
+
+```
+# Example:
+# Type:A, Name:forum.degenrocket.space, IPv4:20.21.03.01, TTL:3h
+```
 
 ---
 
@@ -442,6 +450,20 @@ The script above will:
 * Install Letsencrypt's certbot
 * Request an SSL certificate (for HTTPS connection)
 * Test auto-renewal of a certificate
+
+*Note: if you want to a run an instance on a subdomain like
+'forum.your_domain.com', then instead of running a script above,
+you will have to manually execute the following commands to get
+an SSL cerificate:*
+
+```
+sudo apt-get -y install snapd
+sudo apt-get remove certbot -y
+sudo snap install --classic certbot
+sudo ln -sf /snap/bin/certbot /usr/bin/certbot
+sudo certbot --noninteractive --agree-tos --nginx --cert-name your_domain.com -d forum.your_domain.com --register-unsafely-without-email
+sudo certbot renew --dry-run
+```
 
 Troubleshooting: sometimes you might get the following errors.
 
