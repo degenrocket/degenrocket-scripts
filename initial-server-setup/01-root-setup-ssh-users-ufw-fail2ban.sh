@@ -230,6 +230,7 @@ fi
 
 ################################
 ########### FIREWALL ###########
+apt-get -y update
 apt-get -y install ufw
 # Configure firewall
 sudo ufw allow ${NEW_SSH_PORT}/tcp comment 'SSH'

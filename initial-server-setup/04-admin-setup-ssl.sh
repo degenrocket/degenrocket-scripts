@@ -129,12 +129,12 @@ DIRTY_SITE_TLD="${DIRTY_SITE_TLD#www.}"
 
 # Remove 'staging.' from 'staging.example.com', but not from 'staging.com'.
 # Check if the string contains more than one period
-if [[ "$DIRTY_SITE_TLD" =~ .*\..*\..* ]]; then
+# if [[ "$DIRTY_SITE_TLD" =~ .*\..*\..* ]]; then
   # Remove 'staging.' only if the string starts with it
-  if [[ "$DIRTY_SITE_TLD" == staging.* ]]; then
-    DIRTY_SITE_TLD="${DIRTY_SITE_TLD#staging.}"
-  fi
-fi
+  # if [[ "$DIRTY_SITE_TLD" == staging.* ]]; then
+    # DIRTY_SITE_TLD="${DIRTY_SITE_TLD#staging.}"
+  # fi
+# fi
 
 # Cleaning is done
 CLEAN_SITE_TLD="${DIRTY_SITE_TLD}"
@@ -148,7 +148,7 @@ echo "Trying to resolve the domain name..."
 
 # Sleep is added for UX so a user can terminate the command
 # if a wrong domain name has been specified before pinging it
-# due privacy reasons.
+# due to privacy reasons.
 sleep 5
 
 # Temporary disable exitting on error to check the domain name.
@@ -218,8 +218,16 @@ ln -sf /snap/bin/certbot /usr/bin/certbot
 # certbot certonly --noninteractive --agree-tos --cert-name slickstack -d ${SITE_TLD} -d www.${SITE_TLD} -d staging.${SITE_TLD} -d dev.${SITE_TLD} --register-unsafely-without-email --webroot -w /var/www/html/
 # with docs, spasm, eth, nostr, scan, search, forum subdomains
 # certbot --noninteractive --agree-tos --nginx --cert-name ${SITE_TLD} -d ${SITE_TLD} -d www.${SITE_TLD} -d staging.${SITE_TLD} -d docs.${SITE_TLD} -d spasm.${SITE_TLD} -d eth.${SITE_TLD} -d nostr.${SITE_TLD} -d scan.${SITE_TLD} -d search.${SITE_TLD} -d forum.${SITE_TLD} --register-unsafely-without-email
-# with default subdomains only (www and staging)
-certbot --noninteractive --agree-tos --nginx --cert-name ${SITE_TLD} -d ${SITE_TLD} -d www.${SITE_TLD} -d staging.${SITE_TLD} --register-unsafely-without-email
+
+# Check if the string contains more than one period
+# e.g., 'forum.example.com'
+if [[ "$SITE_TLD" =~ .*\..*\..* ]]; then
+    # without any extra subdomains
+    certbot --noninteractive --agree-tos --nginx --cert-name ${SITE_TLD} -d ${SITE_TLD} --register-unsafely-without-email
+else
+    # with default subdomains (www and staging)
+    certbot --noninteractive --agree-tos --nginx --cert-name ${SITE_TLD} -d ${SITE_TLD} -d www.${SITE_TLD} -d staging.${SITE_TLD} --register-unsafely-without-email
+fi
 
 # Test auto-renewal
 certbot renew --dry-run

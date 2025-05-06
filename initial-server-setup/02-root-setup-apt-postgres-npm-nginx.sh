@@ -39,7 +39,35 @@ apt-get -y update && apt-get -y upgrade
 # Install postgresql database
 # apt-get -y install postgresql-16
 echo "Installing postgresql..."
-apt-get -y install postgresql-16
+# apt-get -y install postgresql-16
+
+# Source the os-release file
+source /etc/os-release
+# Print distribution information
+echo "Distribution: $NAME"
+echo "Version: $VERSION_ID"
+echo "Codename: $VERSION_CODENAME"
+
+if [ "$NAME" = "Ubuntu" ] && [ "$VERSION_ID" = "24.04" ]; then
+    echo "Installing PostgreSQL 16 on Ubuntu 24.04"
+    apt-get update
+    apt-get -y install postgresql-16
+elif [ "$NAME" = "Debian GNU/Linux" ] && [ "$VERSION_ID" = "12" ]; then
+    echo "Installing PostgreSQL 16 on Debian 12"
+    apt-get update
+    apt-get install -y postgresql-common
+    # /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+    # noninteractive allows script execution without user's input
+    DEBIAN_FRONTEND=noninteractive /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh
+    apt-get update
+    apt-get -y install postgresql-16
+else
+    echo "Unsupported distribution: $NAME $VERSION_ID"
+    echo "Trying to install PostgreSQL 16..."
+    apt-get update
+    apt-get -y install postgresql-16
+    # exit 1
+fi
 
 echo "Configuring postgresql..."
 # Change postgresql config otherwise you'll get 'connect econnrefused' error

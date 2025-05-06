@@ -243,7 +243,7 @@ of the server and cannot log in as a root to continue,
 then try to log in as a `user` with port `2222`, e.g.:
 
 ```shell
-ssh -i ~/.ssh/user user@20.21.03.01 -P 2222
+ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
 # Don't forget to change 20.21.03.01 to your server IP address
 
 # then switch to an admin (default password: admin)
@@ -388,7 +388,7 @@ another terminal before running the next script.
 Example:
 
 ```shell
-ssh -i ~/.ssh/user user@20.21.03.01 -P 2222
+ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
 ```
 
 *Note: username and port might be different if you've changed
@@ -445,25 +445,11 @@ sudo bash ~/scripts/initial-server-setup/04-admin-setup-ssl.sh
 ```
 
 The script above will:
-* Ask for your domain name (e.g., degenrocket.space)
+* Ask for your domain name (e.g., example.com or forum.example.com)
 * Install snapd
 * Install Letsencrypt's certbot
 * Request an SSL certificate (for HTTPS connection)
 * Test auto-renewal of a certificate
-
-*Note: if you want to a run an instance on a subdomain like
-'forum.your_domain.com', then instead of running a script above,
-you will have to manually execute the following commands to get
-an SSL cerificate:*
-
-```
-sudo apt-get -y install snapd
-sudo apt-get remove certbot -y
-sudo snap install --classic certbot
-sudo ln -sf /snap/bin/certbot /usr/bin/certbot
-sudo certbot --noninteractive --agree-tos --nginx --cert-name your_domain.com -d forum.your_domain.com --register-unsafely-without-email
-sudo certbot renew --dry-run
-```
 
 Troubleshooting: sometimes you might get the following errors.
 
@@ -794,7 +780,7 @@ Example:
 
 ```shell
 # Don't forget to change '20.21.03.01' to your server IP address
-ssh -i ~/.ssh/user user@20.21.03.01 -P 2222
+ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
 ```
 
 You can also add this to `~/.ssh/config` on your home machine:
