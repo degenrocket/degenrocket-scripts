@@ -180,16 +180,24 @@ echo "root is locked"
 cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 echo "SSH config is backed to /etc/ssh/sshd_config.bak"
 
+# Define the SSH configuration file
+SSH_CONFIG="/etc/ssh/sshd_config"
+
 # Change SSH port because many bots scan default port 22.
 # Port can be changed to a number between 1024 and 65535.
 # Make sure a new port doesn't overlap with ports used by
 # other services. Check used ports with 'netstat -tuln'.
 # Disable root login and password authentication.
-echo "Port ${NEW_SSH_PORT}" >> /etc/ssh/sshd_config
+# Use sed to delete existing lines
+sed -i '/^Port /d' "${SSH_CONFIG}"
+sed -i '/^PermitRootLogin /d' "${SSH_CONFIG}"
+sed -i '/^PasswordAuthentication /d' "${SSH_CONFIG}"
+# Append the new configuration
+echo "Port ${NEW_SSH_PORT}" >> "${SSH_CONFIG}"
 echo "SSH port is changed"
-echo "PermitRootLogin no" >> /etc/ssh/sshd_config
+echo "PermitRootLogin no" >> "${SSH_CONFIG}"
 echo "SSH root login disabled"
-echo "PasswordAuthentication no" >> /etc/ssh/sshd_config
+echo "PasswordAuthentication no" >> "${SSH_CONFIG}"
 echo "SSH password authentication disabled"
 
 # Clean extra config /etc/ssh/sshd_config.d/50-cloud-init.conf

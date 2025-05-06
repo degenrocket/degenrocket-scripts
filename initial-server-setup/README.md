@@ -805,6 +805,7 @@ Host my-server
   Hostname 20.21.03.01
   Port 2222
   User user
+  IdentityFile ~/.ssh/user
 ```
 
 You should now be able to SSH into your server with this command:
