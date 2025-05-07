@@ -363,6 +363,13 @@ DOMAIN_NAME=degenrocket.space
 IP_ADDRESS=80.78.22.221
 ```
 
+Example for running a forum on a subdomain:
+
+```
+DOMAIN_NAME=forum.degenrocket.space
+IP_ADDRESS=80.78.22.221
+```
+
 #### Execute scripts 01, 02, 03 from `root`.
 
 ```shell
@@ -385,6 +392,12 @@ After running the script above your should be able to log into
 your server as a user with a custom port. You can test that in
 another terminal before running the next script.
 
+*Note: if you cannot log into your server as a user, then try
+to reboot the server either from a dashboard or with this
+command `sudo reboot now` and then try to log in again.
+Keep in mind that if you fail to log in, you'll have to
+rebuild the server (reinstall OS) and try again.*
+
 Example:
 
 ```shell
@@ -395,6 +408,17 @@ ssh -i ~/.ssh/user user@20.21.03.01 -p 2222
 them in the .env file.*
 
 Next script.
+
+Make sure to execute the following script from root.
+If you're logged as user, then switch to admin, and then to root.
+Admin's default password is `admin`.
+
+```
+su - admin
+sudo su - root
+```
+
+Execute the script.
 
 ```shell
 bash ~/scripts/initial-server-setup/02-root-setup-apt-postgres-npm-nginx.sh
