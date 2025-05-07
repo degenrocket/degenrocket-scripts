@@ -202,3 +202,4 @@ su - postgres bash -c "env PGPASSWORD=\"${POSTGRES_PASSWORD}\" psql -h localhost
 # Check query:
 # SELECT * FROM actions;
 
+echo "Success. End of script."

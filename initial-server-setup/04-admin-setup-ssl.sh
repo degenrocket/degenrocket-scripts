@@ -236,3 +236,4 @@ certbot renew --dry-run
 # /etc/crontab/
 # /etc/cron.*/*
 # systemctl list-timers
+echo "Success. End of script."

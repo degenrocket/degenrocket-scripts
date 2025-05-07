@@ -75,3 +75,4 @@ crontab -l
 # update them when packages are updated.
 # For example, we can run this script after each node/pm2 update.
 # Alternatively, we can create a cron job to update node/pm2 paths hourly.
+echo "Success. End of script."

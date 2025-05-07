@@ -169,4 +169,4 @@ echo "Nginx config has been changed at: /etc/nginx/sites-available/default"
 nginx -t
 
 service nginx restart
-echo "Success."
+echo "Success. End of script."

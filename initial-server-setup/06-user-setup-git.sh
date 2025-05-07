@@ -146,3 +146,5 @@ echo "Before building the frontend, adjust customization options in:"
 echo "${FRONTEND_FOLDER}/.env"
 echo "Before building the backend, adjust customization options in:"
 echo "${BACKEND_FOLDER}/.env"
+
+echo "Success. End of script."
